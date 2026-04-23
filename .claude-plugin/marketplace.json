@@ -1,0 +1,20 @@
+{
+  "name": "dotlight-marketplace",
+  "description": "Marketplace for DotLightSkillset — a lightweight curated Claude Code skillset for .NET developers",
+  "owner": {
+    "name": "Martin Mudra",
+    "url": "https://github.com/MudraMartin"
+  },
+  "plugins": [
+    {
+      "name": "dotlight-skillset",
+      "source": "./",
+      "version": "0.1.0",
+      "description": "A lightweight curated Claude Code skillset for .NET developers",
+      "author": {
+        "name": "Martin Mudra",
+        "email": "martin.mudra@scalesoft.cz"
+      }
+    }
+  ]
+}
