@@ -1,6 +1,6 @@
 {
   "name": "dotlight-skillset",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A lightweight curated Claude Code skillset for .NET developers. Combines a customized fork of obra/superpowers (workflow) with a trimmed fork of Aaronontheweb/dotnet-skills (patterns), tuned for projects that prefer Minimal API, NHibernate or EF Core, and either Vue or Blazor frontends. Key overrides: AskUserQuestion-first brainstorming, domain-first planning before TDD, and executing-plans preferred over subagent-driven-development.",
   "author": {
     "name": "Martin Mudra",
