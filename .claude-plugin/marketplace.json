@@ -9,7 +9,7 @@
     {
       "name": "dotlight-skillset",
       "source": "./",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "description": "A lightweight curated Claude Code skillset for .NET developers",
       "author": {
         "name": "Martin Mudra",

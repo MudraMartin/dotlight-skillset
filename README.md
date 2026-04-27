@@ -4,11 +4,11 @@
 
 Plugin identifier: `dotlight-skillset`
 
-Combines two upstream MIT skill libraries into one opinionated bundle, with workflow overrides that fix the rough edges of "pure TDD" agent loops.
+Combines three upstream MIT skill libraries into one opinionated bundle, with workflow overrides that fix the rough edges of "pure TDD" agent loops.
 
 ## What it bundles
 
-- **Workflow (13 skills)** — customized fork of [obra/superpowers](https://github.com/obra/superpowers): brainstorming → writing-plans → executing-plans → TDD → code review → finishing-branch, plus worktrees, systematic-debugging, parallel agents, skill authoring.
+- **Workflow (15 skills)** — customized fork of [obra/superpowers](https://github.com/obra/superpowers) plus two adapted skills from [mattpocock/skills](https://github.com/mattpocock/skills) (`grill-me`, `design-an-interface`): brainstorming → writing-plans → executing-plans → TDD → code review → finishing-branch, plus worktrees, systematic-debugging, parallel agents, skill authoring, design-stress-testing, and parallel interface design.
 - **.NET patterns (18 skills)** — curated fork of [Aaronontheweb/dotnet-skills](https://github.com/Aaronontheweb/dotnet-skills): C# standards, Minimal API design, DI, configuration, serialization, Testcontainers, Playwright CI caching, quality gates (slopwatch + CRAP).
 
 Superpowers drives the **process**, dotnet-skills supply the **patterns**.
@@ -76,11 +76,13 @@ Then drag-drop or use your client's plugin install flow.
 
 ## What's in the plugin
 
-### Superpowers workflow (13 skills)
+### Workflow (15 skills)
 
 | Skill | Role |
 |---|---|
 | `brainstorming` | Socratic design refinement — **uses `AskUserQuestion`** + enforces domain-first design |
+| `grill-me`† | Stress-test an existing plan/spec — branch-by-branch interrogation with recommended answers |
+| `design-an-interface`† | Generate 3–4 radically different designs in parallel, then compare on depth and ease of correct use |
 | `writing-plans` | Bite-sized plan — **requires `## Domain Model`** or loops back |
 | `executing-plans` | Batch execution with human checkpoints (preferred exec mode) |
 | `test-driven-development` | RED-GREEN-REFACTOR with domain-model guard |
@@ -93,6 +95,8 @@ Then drag-drop or use your client's plugin install flow.
 | `finishing-a-development-branch` | Merge/PR/keep/discard decision flow |
 | `writing-skills` | Author new skills |
 | `using-superpowers` | Intro to the system |
+
+† Adapted from [mattpocock/skills](https://github.com/mattpocock/skills); the rest are from [obra/superpowers](https://github.com/obra/superpowers).
 
 ### .NET patterns (18 skills)
 
@@ -141,12 +145,18 @@ Superpowers defaults to "brainstorm everything" — the override skips that for 
 flowchart TD
     User([User describes feature]) --> BS["brainstorming<br/>AskUserQuestion-driven<br/>max 5-8 questions"]
     BS --> DomainFirst{{"Design sections —<br/>Domain Model FIRST:<br/>aggregates, invariants,<br/>FK cardinality"}}
-    DomainFirst --> Approve{"User approves?"}
+    DomainFirst --> SurfaceCheck{"Hard-to-change<br/>public surface?<br/>(library API, aggregate,<br/>endpoint group)"}
+    SurfaceCheck -->|Yes| DAI["design-an-interface<br/>3-4 designs in parallel<br/>compare on depth"]
+    DAI --> DomainFirst
+    SurfaceCheck -->|No| Approve{"User approves?"}
+    Approve -->|Grill harder| Grill["grill-me<br/>branch-by-branch<br/>interrogation"]
+    Grill --> DomainFirst
     Approve -->|Revise| DomainFirst
     Approve -->|Yes| Spec[/"Save spec"/]
     Spec --> WP[writing-plans]
     WP --> DMGate{"Plan has<br/>## Domain Model?"}
     DMGate -->|No, stop| BS
+    DMGate -->|Thin / unsure| Grill
     DMGate -->|Yes| EP["executing-plans<br/>batch + checkpoints"]
     EP --> TDD["test-driven-development<br/>honoring aggregates<br/>and invariants"]
     TDD --> TaskLoop{"More tasks?"}
@@ -164,9 +174,11 @@ flowchart TD
     style DomainFirst fill:#cce5ff,stroke:#0066cc
     style DMGate fill:#f8d7da,stroke:#dc3545
     style QG fill:#d1ecf1,stroke:#17a2b8
+    style DAI fill:#e2d4f0,stroke:#6f42c1
+    style Grill fill:#ffe5cc,stroke:#fd7e14
 ```
 
-Two loop-backs do the real work: **`writing-plans` → `brainstorming`** when the domain model is missing, and **`requesting-code-review` → `executing-plans`** when quality gates find critical issues.
+Two loop-backs do the real work: **`writing-plans` → `brainstorming`** when the domain model is missing, and **`requesting-code-review` → `executing-plans`** when quality gates find critical issues. Two opt-in side-trips strengthen the design before it locks in: **`design-an-interface`** when the public surface is hard to change later, and **`grill-me`** when a draft spec or thin domain model needs branch-by-branch interrogation.
 
 ### 3. TDD with the domain-first guard
 
@@ -227,12 +239,13 @@ The plugin provides the skills — `CLAUDE.md` tells the agent when to use them.
 
 DotLightSkillset is MIT-licensed, © 2026 Martin Mudra. See [`LICENSE`](./LICENSE).
 
-Combines modified forks of two upstream MIT projects, with both licenses preserved verbatim in [`THIRD_PARTY_LICENSES.md`](./THIRD_PARTY_LICENSES.md):
+Combines modified forks of three upstream MIT projects, with all licenses preserved verbatim in [`THIRD_PARTY_LICENSES.md`](./THIRD_PARTY_LICENSES.md):
 
 - **[obra/superpowers](https://github.com/obra/superpowers)** — © 2025 Jesse Vincent / Prime Radiant
 - **[Aaronontheweb/dotnet-skills](https://github.com/Aaronontheweb/dotnet-skills)** — © 2025 Aaron Stannard
+- **[mattpocock/skills](https://github.com/mattpocock/skills)** — © 2026 Matt Pocock (`grill-me` and `design-an-interface` only)
 
-When redistributing (fork, rebrand, package), both license files must remain.
+When redistributing (fork, rebrand, package), all license files must remain.
 
 ## Contributing & status
 
