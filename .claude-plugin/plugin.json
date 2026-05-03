@@ -1,6 +1,6 @@
 {
   "name": "dotlight-skillset",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "A lightweight curated Claude Code skillset for .NET developers. Combines a customized fork of obra/superpowers (workflow), a trimmed fork of Aaronontheweb/dotnet-skills (patterns + agents), and adapted skills from mattpocock/skills (grill-me, design-an-interface). Tuned for .NET 10 + Aspire + Minimal API + NHibernate or EF Core projects with Vue or Blazor frontends. Key overrides: AskUserQuestion-first brainstorming (with deferred-tool preload), domain-first planning before TDD, and executing-plans preferred over subagent-driven-development.",
   "author": {
     "name": "Martin Mudra",
@@ -43,6 +43,7 @@
     "./superpowers/writing-skills",
     "./dotnet/aspire-configuration",
     "./dotnet/aspire-integration-testing",
+    "./dotnet/aspire-mcp-first",
     "./dotnet/aspire-service-defaults",
     "./dotnet/crap-analysis",
     "./dotnet/csharp-api-design",

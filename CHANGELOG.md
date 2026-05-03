@@ -4,6 +4,30 @@ All notable changes to DotLightSkillset will be documented in this file.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.2] — 2026-05-04
+
+### Added — `aspire-mcp-first`
+
+New `dotnet/` skill: `aspire-mcp-first`. When the Aspire CLI MCP server is attached (`mcp__aspire__*` tools available, typically via `<project-root>/.mcp.json` declaring `aspire agent mcp` as a stdio server) AND a .NET Aspire AppHost is running, the skill forces use of Aspire's MCP for runtime queries (resource state, real-time console logs across all services, distributed traces, dynamic endpoints, resource commands) **before** shelling out to `docker logs`, parsing log files, or guessing at AppHost ports.
+
+Framing is **situational**, not always-on: most coding sessions don't touch a running Aspire app. When they do — debugging a service that won't respond, hunting a flaky integration test, investigating a distributed trace — the skill applies hard.
+
+Includes setup instructions (`dotnet tool install -g Aspire.Cli`, `aspire mcp init` or project-scoped `.mcp.json`), a decision table for runtime queries, anti-patterns ("I'll just `docker logs` it", "I'll grep AppHost.cs for the port" — Aspire ports are dynamic), and cooperation notes with `rider-mcp-first` (Rider for source, Aspire for runtime — orthogonal, use both).
+
+### Changed — `rider-mcp-first` invocation framing sharpened
+
+The 0.4.0/0.4.1 skill was correct in body but **passive in description**. Skills auto-invoke based on description, not body — so when the description was informative ("use Rider's semantic operations BEFORE filesystem"), the model could rationalize "I know that, no need to invoke" and the EXTREMELY-IMPORTANT body never reached context. Result: persistent leak to `Grep` / `Read` despite the skill existing.
+
+Fixes:
+- **Description rewritten as imperative**: *"MANDATORY before ANY Grep/Read/Glob/Edit on files inside a .NET solution folder ... Skipping this skill in a Rider-attached session wastes 5-10x the tokens on every file operation. Invoke at session start AND at first sign of any .NET file work — not just when 'exploring.'"*
+- **Body lead now demands an immediate tool-list scan** (`STOP. Before reading further, scan your current tool list for any tool name starting with mcp__rider__.`) and adds a **per-call gate** (`Before every single Grep/Read/Glob/Edit call, ask: 'Is the target inside the solution folder, and is mcp__rider__* in my tool list?'`) — this catches the reflexive fallback the skill was missing.
+- Explicit naming of the failure mode: *"That reflex is the bug this skill exists to suppress."*
+
+### Changed — manifests
+
+- `plugin.json` and `marketplace.json` both bumped to `0.4.2` (synchronous as always)
+- `.NET patterns` count: **26** (was 25). Aspire skills count climbs to 4 (configuration, service-defaults, integration-testing, mcp-first).
+
 ## [0.4.1] — 2026-05-04
 
 ### Fixed — `rider-mcp-first` rationalization loophole

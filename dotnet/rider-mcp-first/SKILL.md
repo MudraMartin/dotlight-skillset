@@ -1,18 +1,19 @@
 ---
 name: rider-mcp-first
-description: When working in a .NET solution with the JetBrains Rider MCP server attached (mcp__rider__* tools available), use Rider's semantic operations BEFORE filesystem Grep/Read/Edit. Saves 50-90% of context tokens on .NET exploration tasks.
+description: MANDATORY before ANY Grep/Read/Glob/Edit on files inside a .NET solution folder (.cs, .csproj, .sln, .slnx, .vue, .ts, .razor, .scss, .json) when mcp__rider__* tools exist in the tool list. Skipping this skill in a Rider-attached session wastes 5-10x the tokens on every file operation. Invoke at session start AND at first sign of any .NET file work — not just when "exploring."
 ---
 
 # Rider MCP First
 
 <EXTREMELY-IMPORTANT>
-If `mcp__rider__*` tools are available in your tool list AND you are working with C# / .NET / `.csproj` / `.sln` / `.slnx` files, you ABSOLUTELY MUST prefer them over `Grep` / `Read` / `Glob` / `Edit` for code operations.
+**STOP. Before reading further, scan your current tool list for any tool name starting with `mcp__rider__`.**
 
-Filesystem tools answer **"what bytes are here?"**. Rider tools answer **"what does this code MEAN?"** — and the second is what you actually need 90% of the time when navigating .NET code.
+- **If present** → you ABSOLUTELY MUST follow this skill for every file operation inside the solution folder. Reflexive `Grep` / `Read` / `Glob` / `Edit` on `.cs`, `.csproj`, `.sln`, `.slnx`, `.vue`, `.ts`, `.razor`, `.scss`, `.json` (when inside the solution) is a token leak. No exceptions for "this one's quick", "I'm just confirming", or "I'm more comfortable with Grep". The user pays for every wasted token.
+- **If absent** → tell the user once: *"Rider MCP not attached — open Rider on the solution and I'll be 50–90% more efficient."* Then proceed with filesystem tools. Do not pester them again.
 
-This is not negotiable. Defaulting to Grep/Read in a Rider-attached session burns the user's tokens for zero benefit. The Rider MCP server has a pre-built ReSharper semantic index — your search query returns the answer, not 50 KB of file contents to scan.
+This skill is rigid, not flexible. The model has a strong reflex to fall back to `Grep` / `Read` because they are familiar. **That reflex is the bug this skill exists to suppress.** Filesystem tools answer "what bytes are here?". Rider tools answer "what does this code MEAN?" — and the second is what you actually need 90% of the time. The Rider MCP server has a pre-built ReSharper semantic index; your query returns ~100 tokens of answer instead of ~30 KB of file contents to scan.
 
-**Before your first .NET file operation in any session: scan your tool list for `mcp__rider__*`. If present, follow this skill. If absent, proceed with filesystem tools and tell the user "Rider MCP not attached — open Rider on the solution and I'll be 50–90% more efficient."**
+**Per-call gate.** Before *every single* `Grep` / `Read` / `Glob` / `Edit` call you are about to make, ask yourself: *"Is the target inside the solution folder, and is `mcp__rider__*` in my tool list?"* If yes to both, **switch to the Rider equivalent** (table below). This check takes one cheap thought; skipping it costs the user thousands of tokens.
 </EXTREMELY-IMPORTANT>
 
 ## Quick decision table
