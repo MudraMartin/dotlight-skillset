@@ -39,16 +39,30 @@ This is not negotiable. Defaulting to Grep/Read in a Rider-attached session burn
 | Custom code inspection | `mcp__rider__run_inspection_kts` (+ `_api`/`_examples`) | not available via filesystem |
 | Semantic tree of file | `mcp__rider__generate_psi_tree` | not available via filesystem |
 
+## Two-layer model: semantic vs text
+
+Rider MCP exposes **two layers** of operations. Don't conflate them — the rule for falling back to filesystem is different for each.
+
+**Layer 1 — Semantic (typed, language-aware).** Backed by IDE language plugins / PSI index.
+- C# / F# / Razor — always available (ReSharper)
+- TypeScript / JavaScript — always available (JS plugin is bundled)
+- Vue components, props, emits, refs — **only if the JetBrains Vue plugin is installed** in Rider. Pre-installed in newer Rider builds, not guaranteed
+- Tools affected: `search_symbol`, `get_symbol_info`, `find_references`, `rename_refactoring`, `move_type_to_namespace`, `generate_psi_tree`
+
+**Layer 2 — Text / glob (works on any file in the solution folder).** Backed by IDE file index, not language semantics.
+- Tools affected: `find_files_by_glob`, `find_files_by_name_keyword`, `search_in_files_by_regex`, `search_in_files_by_text`, `read_file`, `replace_text_in_file`, `list_directory_tree`
+- These work on **`.vue`, `.ts`, `.js`, `.scss`, `.md`, `.json`, `.yml`** — anything in the solution folder. They are **scoped to the solution and respect IDE excludes** (no `node_modules/`, `bin/`, `obj/` noise), so they remain better than raw `Grep` even for non-C# files.
+
 ## When filesystem tools are still right
 
-Rider doesn't index everything. For these, default to `Grep` / `Read` / `Glob` / `Edit`:
+Default to `Grep` / `Read` / `Glob` / `Edit` only when:
 
-- Non-code files: `.md`, `.json`, `.yml`, `.yaml`, `.toml`, `.razor`, `.vue`, `.ts`, `.js`, `.scss`
-- Files outside the solution folder: docs, specs, repo-root config, `Resources/`, `experiments/`
-- Cross-cutting text search across mixed file types (e.g. "find every TODO across the whole repo regardless of language")
-- Quick existence checks where you don't need semantic info
-- Anything in `.git/`, `node_modules/`, `bin/`, `obj/`
-- When `mcp__rider__*` is **not** in your tool list (Rider closed, plugin disabled, MCP misconfigured) — fall back without shame
+- **Files outside the solution folder** — repo-root docs (`docs/`, `Resources/`, `experiments/`), top-level config that isn't part of any project. Rider's index is solution-scoped; for everything outside, filesystem wins.
+- **Cross-repo or cross-solution search** spanning multiple solution folders or external worktrees.
+- **Rider not attached** — `mcp__rider__*` absent from your tool list (Rider closed, plugin disabled, MCP misconfigured). Fall back without shame.
+- **Trivially fast existence check** for a single known path where loading any tool is overkill.
+
+For *anything else*, including `.vue` / `.ts` / `.scss` inside the solution: prefer `mcp__rider__search_in_files_by_*` and `mcp__rider__find_files_by_*` over `Grep` and `Glob`. They are scoped, deduped, and faster.
 
 ## Setup prerequisite
 
@@ -80,6 +94,8 @@ When in doubt, run `mcp__rider__get_solution_projects` first to confirm the solu
 | "Filesystem is more reliable" | Both are reliable. Rider is dramatically cheaper. |
 | "I need to see the whole file anyway" | No, you usually need a class definition, a method, or a usage list. Those are semantic operations. |
 | "I'll batch a few `Grep`s in parallel" | Two parallel `Grep`s on a large solution = 60 KB of context. One `find_references` = 200 tokens. Math wins. |
+| "Rider doesn't index `.vue` / `.ts` / `.scss`, I'll use `Grep`" | **False dichotomy.** Semantic ops (`search_symbol`, `find_references`) may have limited coverage for those without the right language plugin — but **text ops (`search_in_files_by_*`, `find_files_by_*`, `read_file`) work on every file in the solution folder** and are still solution-scoped, dedup'd, and `node_modules`/`bin`/`obj`-free. Use the text tools, not `Grep`. |
+| "It's a non-C# file, the skill doesn't apply" | The skill applies to **everything inside the solution folder**, regardless of language. Only step out of Rider for files genuinely outside the solution scope. |
 
 ## Token math (why this skill exists)
 

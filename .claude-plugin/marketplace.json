@@ -9,8 +9,8 @@
     {
       "name": "dotlight-skillset",
       "source": "./",
-      "version": "0.4.0",
-      "description": "A lightweight curated Claude Code skillset for .NET developers — Aspire (3 skills), OpenTelemetry, ILSpy, Blazor Playwright, 3 specialized .NET agents, and rider-mcp-first (50-90% token savings when Rider MCP is attached)",
+      "version": "0.4.1",
+      "description": "A lightweight curated Claude Code skillset for .NET developers — Aspire (3 skills), OpenTelemetry, ILSpy, Blazor Playwright, 3 specialized .NET agents, and rider-mcp-first (50-90% token savings when Rider MCP is attached, now with explicit Vue/TS coverage)",
       "author": {
         "name": "Martin Mudra",
         "email": "martin.mudra@scalesoft.cz"

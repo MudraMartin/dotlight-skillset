@@ -4,6 +4,25 @@ All notable changes to DotLightSkillset will be documented in this file.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.1] — 2026-05-04
+
+### Fixed — `rider-mcp-first` rationalization loophole
+
+The 0.4.0 skill said *"Rider doesn't index everything; for non-C# files, default to filesystem."* That listing included `.vue`, `.ts`, `.js`, `.scss` — which let the model rationalize **"Rider doesn't index .vue, I'll use `Grep`"** and silently drop back to the filesystem for any non-C# work. Observed in real session: *"Vue soubory Rider neindexuje jako .vue — použiji přímý search pro zbytek."*
+
+The fix splits Rider MCP tools into two layers and clarifies the fallback rule for each:
+
+- **Layer 1 — Semantic ops** (`search_symbol`, `find_references`, `get_symbol_info`, `rename_refactoring`, `move_type_to_namespace`, `generate_psi_tree`): typed and language-aware. C#/F#/Razor always work via ReSharper. TypeScript/JavaScript always work via the bundled JS plugin. Vue requires the JetBrains Vue plugin (pre-installed in newer Rider builds, not guaranteed).
+- **Layer 2 — Text/glob ops** (`search_in_files_by_*`, `find_files_by_*`, `read_file`, `replace_text_in_file`, `list_directory_tree`): work on **any file** in the solution folder, regardless of language. Solution-scoped, dedup'd, `node_modules` / `bin` / `obj`-free. **Better than raw `Grep` even for `.vue` / `.ts` / `.scss`.**
+
+Filesystem fallback is now narrowed to: files genuinely outside the solution folder, cross-repo search, and the Rider-not-attached case.
+
+Two new entries in the Red Flags table catch the specific anti-patterns: "Rider doesn't index .vue" and "non-C# file → skill doesn't apply".
+
+### Changed
+
+- `plugin.json` and `marketplace.json` both bumped to `0.4.1` (synchronous as always)
+
 ## [0.4.0] — 2026-05-03
 
 ### Added — `rider-mcp-first`
