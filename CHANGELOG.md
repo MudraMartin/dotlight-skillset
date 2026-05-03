@@ -4,6 +4,27 @@ All notable changes to DotLightSkillset will be documented in this file.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] — 2026-05-03
+
+### Added — `rider-mcp-first`
+
+One new `dotnet/` skill: `rider-mcp-first`. When the JetBrains Rider MCP server is attached (`mcp__rider__*` tools available in the model's tool list), this skill is `<EXTREMELY-IMPORTANT>`-flagged to force Rider's semantic operations (`search_symbol`, `find_references`, `get_symbol_info`, `rename_refactoring`, `get_project_dependencies`, …) **before** filesystem `Grep` / `Read` / `Edit` for any C# / `.csproj` / `.sln` / `.slnx` work.
+
+**Why this matters:** ReSharper's pre-built semantic index returns a 100-token answer where `Grep` returns 5–30 KB of file contents per call. On a typical "explore the auth flow" session in a 50-class .NET solution, the difference is roughly **120 K tokens (filesystem) vs 15 K tokens (Rider) — a 105 K saving per session**. That's a quarter of a 200 K context window or 10 % of a 1 M window, repeated.
+
+The skill includes:
+- A decision table for every `mcp__rider__*` tool vs its filesystem equivalent
+- Explicit fall-back rules for non-code files, files outside the solution, and Rider-not-attached sessions
+- Setup prerequisite (Rider must be open, JetBrains MCP plugin enabled, endpoint registered)
+- The `projectPath` quirk (solution folder, not repo root)
+- A "Red Flags" table modeled on `using-superpowers` to break reflexive `Grep`/`Read`
+
+### Changed
+
+- `plugin.json` and `marketplace.json` both bumped to `0.4.0` (synchronous, as always — the v0.2.0 lesson stays learned)
+- `.NET patterns` count: **25** (was 24)
+- README *.NET patterns* table gains `rider-mcp-first` row
+
 ## [0.3.0] — 2026-05-03
 
 ### Added — Aspire is back

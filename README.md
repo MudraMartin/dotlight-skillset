@@ -9,7 +9,7 @@ Combines three upstream MIT skill libraries into one opinionated bundle, with wo
 ## What it bundles
 
 - **Workflow (15 skills)** — customized fork of [obra/superpowers](https://github.com/obra/superpowers) plus two adapted skills from [mattpocock/skills](https://github.com/mattpocock/skills) (`grill-me`, `design-an-interface`): brainstorming → writing-plans → executing-plans → TDD → code review → finishing-branch, plus worktrees, systematic-debugging, parallel agents, skill authoring, design-stress-testing, and parallel interface design.
-- **.NET patterns (24 skills)** — curated fork of [Aaronontheweb/dotnet-skills](https://github.com/Aaronontheweb/dotnet-skills): C# standards, Minimal API design, DI, configuration, serialization, Aspire (3 skills incl. integration-testing), OpenTelemetry, Testcontainers, Playwright (Blazor + CI caching), ILSpy decompilation, quality gates (slopwatch + CRAP).
+- **.NET patterns (25 skills)** — curated fork of [Aaronontheweb/dotnet-skills](https://github.com/Aaronontheweb/dotnet-skills): C# standards, Minimal API design, DI, configuration, serialization, Aspire (3 skills incl. integration-testing), OpenTelemetry, Testcontainers, Playwright (Blazor + CI caching), ILSpy decompilation, quality gates (slopwatch + CRAP). Plus dotlight-original `rider-mcp-first` — when JetBrains Rider MCP is attached, force semantic operations over filesystem Grep/Read for **50–90 % token savings on .NET exploration**.
 - **Specialized .NET agents (3)** — `dotnet-performance-analyst`, `dotnet-benchmark-designer`, `dotnet-concurrency-specialist`. Use the `Agent` tool with `subagent_type` matching the agent name.
 
 Superpowers drives the **process**, dotnet-skills supply the **patterns**, agents do **focused diagnostic work**.
@@ -109,7 +109,7 @@ Then drag-drop or use your client's plugin install flow.
 
 † Adapted from [mattpocock/skills](https://github.com/mattpocock/skills); the rest are from [obra/superpowers](https://github.com/obra/superpowers).
 
-### .NET patterns (24 skills)
+### .NET patterns (25 skills)
 
 | Skill | Role |
 |---|---|
@@ -135,6 +135,7 @@ Then drag-drop or use your client's plugin install flow.
 | `playwright-ci-caching` | Browser caching in CI |
 | `playwright-blazor-testing` | UI tests for Blazor Server / WebAssembly |
 | `ilspy-decompile` | Inspect compiled .NET assemblies via `ilspycmd` |
+| `rider-mcp-first` ⚡ | **EXTREMELY-IMPORTANT** — when JetBrains Rider MCP is attached, force `mcp__rider__*` semantic ops before Grep/Read/Edit. ~50–90 % token savings on .NET exploration. |
 | `dotnet-slopwatch` | Quality gate — detects LLM-generated anti-patterns |
 | `crap-analysis` | Quality gate — CRAP score, flags trivial tests |
 
@@ -275,6 +276,8 @@ Combines modified forks of three upstream MIT projects, with all licenses preser
 When redistributing (fork, rebrand, package), all license files must remain.
 
 ## Contributing & status
+
+**v0.4.0 — `rider-mcp-first`.** New EXTREMELY-IMPORTANT skill: when JetBrains Rider MCP is attached (`mcp__rider__*` in tool list), use Rider's ReSharper-indexed semantic operations before filesystem Grep/Read/Edit for any .NET work. Saves ~105 K tokens per typical exploration session. Pair with `<project-root>/.mcp.json` registering Rider's MCP endpoint (`http://127.0.0.1:64342/stream` for newer JetBrains MCP plugin versions).
 
 **v0.3.0 — Aspire is back.** Six new dotnet skills (3× Aspire, OpenTelemetry, ILSpy, Blazor Playwright), three specialized agents (`dotnet-performance-analyst`, `dotnet-benchmark-designer`, `dotnet-concurrency-specialist`), and a fix for the long-standing `AskUserQuestion` deferred-tool problem in `brainstorming` and `grill-me`. See `CHANGELOG.md`.
 
