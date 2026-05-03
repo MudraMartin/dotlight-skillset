@@ -9,8 +9,8 @@
     {
       "name": "dotlight-skillset",
       "source": "./",
-      "version": "0.2.0",
-      "description": "A lightweight curated Claude Code skillset for .NET developers",
+      "version": "0.3.0",
+      "description": "A lightweight curated Claude Code skillset for .NET developers — now with Aspire (3 skills), OpenTelemetry, ILSpy, Blazor Playwright, and 3 specialized .NET agents",
       "author": {
         "name": "Martin Mudra",
         "email": "martin.mudra@scalesoft.cz"

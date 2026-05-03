@@ -6,7 +6,7 @@ DotLightSkillset is built from **modified forks** of three upstream libraries. A
 
 ## 1. obra/superpowers
 
-Content of the `superpowers/` directory (13 skills) originates from this library. Some `SKILL.md` files have been modified — see the "Modified from upstream" section in `CHANGELOG.md` and `README.md`.
+Content of the `superpowers/` directory (13 of 15 skills — the other two are from mattpocock/skills, see section 3) originates from this library. Several `SKILL.md` files have been modified — see the "Modified from upstream" section in `CHANGELOG.md` and `README.md`.
 
 **Repository:** https://github.com/obra/superpowers
 **Upstream license file:** https://github.com/obra/superpowers/blob/main/LICENSE
@@ -39,7 +39,7 @@ SOFTWARE.
 
 ## 2. Aaronontheweb/dotnet-skills
 
-Content of the `dotnet/` directory (18 skills) originates from this library. The skills themselves have not been modified, only selected (several upstream skills were excluded — Akka.NET, Aspire, Blazor-Playwright, and others). See `CHANGELOG.md` for the full list of exclusions.
+Content of the `dotnet/` directory (24 skills) and `agents/` directory (3 agents) originates from this library. The content has been mostly preserved verbatim with light editorial changes (renaming `opentelementry-dotnet-instrumentation` → `opentelemetry-instrumentation`, `playwright-blazor` → `playwright-blazor-testing`, fixing internal cross-references). Several upstream skills are still excluded — all `akka-*` (5), `aspire-mailpit-integration`, `mjml-email-templates`, `verify-email-snapshots`, `marketplace-publishing`, `skills-index-snippets`. Excluded agents: `akka-net-specialist`, `docfx-specialist`, `roslyn-incremental-generator-specialist`. See `CHANGELOG.md` for the version-by-version delta.
 
 **Repository:** https://github.com/Aaronontheweb/dotnet-skills
 **Upstream license file:** https://github.com/Aaronontheweb/dotnet-skills/blob/master/LICENSE

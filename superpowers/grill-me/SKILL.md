@@ -28,6 +28,7 @@ Use this when the input already exists:
 5. **Always provide a recommended answer.** Phrase it: *"Recommended: X. Reason: Y."* The user pushes back, accepts, or refines. Never ask an open-ended "what do you think?" — that's brainstorming, not grilling.
 6. **Prefer the codebase to the user.** If a question is answerable by reading code, configuration, migrations, recent commits, or referenced docs, **read first, ask only if still ambiguous.** "Does this aggregate already exist?" is a `Grep` away.
 7. **Use `AskUserQuestion` for choice-shaped questions** (2–4 distinct options). Free-text only when the answer space is genuinely open (a name, a number, a free-form rationale). The first option in `AskUserQuestion` is your recommendation, labeled "(Recommended)".
+   - **Deferred-tool note**: In Claude Code 2.x+, `AskUserQuestion` may appear in a `<system-reminder>` listing deferred tools. If so, call `ToolSearch` with `"select:AskUserQuestion"` once at session start to load its schema — otherwise calls fail with `InputValidationError` and the skill silently degrades to text "1, 2, 3" lists.
 8. **Push back on hand-waving.** "We'll figure it out later" and "it should be fine" are not answers — they are unresolved branches. Mark them and return.
 9. **Stop when the tree is resolved**, not when the user gets tired. If the user wants to stop early, summarize the *unresolved* branches as risks before exiting.
 

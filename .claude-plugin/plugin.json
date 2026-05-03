@@ -1,7 +1,7 @@
 {
   "name": "dotlight-skillset",
-  "version": "0.2.0",
-  "description": "A lightweight curated Claude Code skillset for .NET developers. Combines a customized fork of obra/superpowers (workflow) with a trimmed fork of Aaronontheweb/dotnet-skills (patterns), tuned for projects that prefer Minimal API, NHibernate or EF Core, and either Vue or Blazor frontends. Key overrides: AskUserQuestion-first brainstorming, domain-first planning before TDD, and executing-plans preferred over subagent-driven-development.",
+  "version": "0.3.0",
+  "description": "A lightweight curated Claude Code skillset for .NET developers. Combines a customized fork of obra/superpowers (workflow), a trimmed fork of Aaronontheweb/dotnet-skills (patterns + agents), and adapted skills from mattpocock/skills (grill-me, design-an-interface). Tuned for .NET 10 + Aspire + Minimal API + NHibernate or EF Core projects with Vue or Blazor frontends. Key overrides: AskUserQuestion-first brainstorming (with deferred-tool preload), domain-first planning before TDD, and executing-plans preferred over subagent-driven-development.",
   "author": {
     "name": "Martin Mudra",
     "email": "martin.mudra@scalesoft.cz"
@@ -12,6 +12,7 @@
   "keywords": [
     "dotnet",
     "csharp",
+    "aspire",
     "minimal-api",
     "workflow",
     "tdd",
@@ -21,6 +22,7 @@
     "brainstorming",
     "code-review",
     "skills",
+    "agents",
     "claude-code"
   ],
   "skills": [
@@ -39,6 +41,9 @@
     "./superpowers/verification-before-completion",
     "./superpowers/writing-plans",
     "./superpowers/writing-skills",
+    "./dotnet/aspire-configuration",
+    "./dotnet/aspire-integration-testing",
+    "./dotnet/aspire-service-defaults",
     "./dotnet/crap-analysis",
     "./dotnet/csharp-api-design",
     "./dotnet/csharp-coding-standards",
@@ -47,15 +52,23 @@
     "./dotnet/database-performance",
     "./dotnet/dotnet-devcert-trust",
     "./dotnet/efcore-patterns",
+    "./dotnet/ilspy-decompile",
     "./dotnet/local-tools",
     "./dotnet/microsoft-extensions-configuration",
     "./dotnet/microsoft-extensions-dependency-injection",
+    "./dotnet/opentelemetry-instrumentation",
     "./dotnet/package-management",
+    "./dotnet/playwright-blazor-testing",
     "./dotnet/playwright-ci-caching",
     "./dotnet/project-structure",
     "./dotnet/serialization",
     "./dotnet/slopwatch",
     "./dotnet/snapshot-testing",
     "./dotnet/testcontainers"
+  ],
+  "agents": [
+    "./agents/dotnet-benchmark-designer.md",
+    "./agents/dotnet-concurrency-specialist.md",
+    "./agents/dotnet-performance-analyst.md"
   ]
 }

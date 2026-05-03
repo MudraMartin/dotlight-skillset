@@ -9,9 +9,10 @@ Combines three upstream MIT skill libraries into one opinionated bundle, with wo
 ## What it bundles
 
 - **Workflow (15 skills)** — customized fork of [obra/superpowers](https://github.com/obra/superpowers) plus two adapted skills from [mattpocock/skills](https://github.com/mattpocock/skills) (`grill-me`, `design-an-interface`): brainstorming → writing-plans → executing-plans → TDD → code review → finishing-branch, plus worktrees, systematic-debugging, parallel agents, skill authoring, design-stress-testing, and parallel interface design.
-- **.NET patterns (18 skills)** — curated fork of [Aaronontheweb/dotnet-skills](https://github.com/Aaronontheweb/dotnet-skills): C# standards, Minimal API design, DI, configuration, serialization, Testcontainers, Playwright CI caching, quality gates (slopwatch + CRAP).
+- **.NET patterns (24 skills)** — curated fork of [Aaronontheweb/dotnet-skills](https://github.com/Aaronontheweb/dotnet-skills): C# standards, Minimal API design, DI, configuration, serialization, Aspire (3 skills incl. integration-testing), OpenTelemetry, Testcontainers, Playwright (Blazor + CI caching), ILSpy decompilation, quality gates (slopwatch + CRAP).
+- **Specialized .NET agents (3)** — `dotnet-performance-analyst`, `dotnet-benchmark-designer`, `dotnet-concurrency-specialist`. Use the `Agent` tool with `subagent_type` matching the agent name.
 
-Superpowers drives the **process**, dotnet-skills supply the **patterns**.
+Superpowers drives the **process**, dotnet-skills supply the **patterns**, agents do **focused diagnostic work**.
 
 ## Why this exists
 
@@ -29,13 +30,23 @@ Fixed in modified `SKILL.md` files:
 ## What's deliberately excluded
 
 - From Superpowers: `subagent-driven-development` (too slow; prefer `executing-plans`)
-- From dotnet-skills: all `akka-*` (5), all `aspire-*` (4), `playwright-blazor`, `mjml-email-templates`, `verify-email-snapshots`, `opentelementry-dotnet-instrumentation`, `ilspy-decompile`, `marketplace-publishing`, `skills-index-snippets`
+- From dotnet-skills (skills): all `akka-*` (5), `aspire-mailpit-integration`, `mjml-email-templates`, `verify-email-snapshots`, `marketplace-publishing`, `skills-index-snippets`
+- From dotnet-skills (agents): `akka-net-specialist`, `docfx-specialist`, `roslyn-incremental-generator-specialist`
 
-For those, install the upstream plugins alongside DotLightSkillset — they cooperate fine.
+For Akka.NET, Mailpit, or DocFX work, install the upstream `dotnet-skills` plugin alongside — they cooperate fine.
+
+## Companion plugins (recommended pairings)
+
+DotLightSkillset focuses on the .NET workflow surface. For adjacent specialties, pair it with:
+
+- **[VoltAgent — `voltagent-data-ai`](https://github.com/VoltAgent/awesome-claude-code-subagents)** — specialist agents for data-heavy .NET work: `postgres-pro`, `database-optimizer`, `data-engineer`, `ml-engineer`, `data-scientist`. Particularly useful with TimescaleDB / EF Core / NHibernate projects that grow ML-adjacent.
+- **`playwright@claude-plugins-official`** — general Playwright MCP integration for non-Blazor SPA stacks (Vue/Vite, React, etc.). Dotlight only ships the Blazor-specific Playwright skill.
+
+These work in parallel — no conflicts.
 
 ## Who this is for
 
-.NET developers using **Minimal API**, **NHibernate or EF Core**, and **Vue/Vite** or **Blazor** frontends, who want the auto-review / brainstorming / planning flow from Superpowers without having the agent design the domain for them via TDD. If you're on Aspire or Akka.NET, install the full [Aaronontheweb/dotnet-skills](https://github.com/Aaronontheweb/dotnet-skills) instead — DotLightSkillset is opinionated about omissions.
+.NET developers using **.NET 10**, **Aspire** (or pure host builders), **Minimal API**, **NHibernate or EF Core**, **Postgres / TimescaleDB**, and **Vue/Vite** or **Blazor** frontends, who want the auto-review / brainstorming / planning flow from Superpowers without having the agent design the domain for them via TDD. If you also need Akka.NET, install the upstream `dotnet-skills` plugin alongside — DotLightSkillset is opinionated about which extensions live in scope.
 
 ## Installation
 
@@ -98,7 +109,7 @@ Then drag-drop or use your client's plugin install flow.
 
 † Adapted from [mattpocock/skills](https://github.com/mattpocock/skills); the rest are from [obra/superpowers](https://github.com/obra/superpowers).
 
-### .NET patterns (18 skills)
+### .NET patterns (24 skills)
 
 | Skill | Role |
 |---|---|
@@ -115,11 +126,27 @@ Then drag-drop or use your client's plugin install flow.
 | `dotnet-devcert-trust` | HTTPS dev cert |
 | `database-performance` | Read/write separation, N+1, AsNoTracking |
 | `efcore-patterns` | EF Core entity configuration and queries |
-| `testcontainers-integration-tests` | Docker-based integration tests |
+| `aspire-configuration` | AppHost as explicit env-var bridge; app code free of Aspire clients |
+| `aspire-service-defaults` | Shared OpenTelemetry / health checks / resilience / discovery setup |
+| `aspire-integration-testing` | `DistributedApplicationTestingBuilder` — primary lever for parallel integration tests |
+| `opentelemetry-instrumentation` | ActivitySource/Meter patterns, semantic conventions, zero-allocation paths |
+| `testcontainers-integration-tests` | Docker-based integration tests (alternative to Aspire) |
 | `snapshot-testing` | Verify library, approval testing |
 | `playwright-ci-caching` | Browser caching in CI |
+| `playwright-blazor-testing` | UI tests for Blazor Server / WebAssembly |
+| `ilspy-decompile` | Inspect compiled .NET assemblies via `ilspycmd` |
 | `dotnet-slopwatch` | Quality gate — detects LLM-generated anti-patterns |
 | `crap-analysis` | Quality gate — CRAP score, flags trivial tests |
+
+### Specialized .NET agents (3)
+
+Invoke via the `Agent` tool with `subagent_type: <agent-name>`.
+
+| Agent | Use for |
+|---|---|
+| `dotnet-performance-analyst` | Interpreting JetBrains profiler / BenchmarkDotNet output, regression detection, hot-path delegate allocation analysis |
+| `dotnet-benchmark-designer` | Designing reliable BenchmarkDotNet suites; deciding when BDN doesn't fit and a custom harness is needed |
+| `dotnet-concurrency-specialist` | Diagnosing race conditions, async/await pitfalls, deadlocks, and timing-dependent test failures |
 
 ## How it flows
 
@@ -249,6 +276,6 @@ When redistributing (fork, rebrand, package), all license files must remain.
 
 ## Contributing & status
 
-**v0.1.0 — initial release.** Early; expect churn.
+**v0.3.0 — Aspire is back.** Six new dotnet skills (3× Aspire, OpenTelemetry, ILSpy, Blazor Playwright), three specialized agents (`dotnet-performance-analyst`, `dotnet-benchmark-designer`, `dotnet-concurrency-specialist`), and a fix for the long-standing `AskUserQuestion` deferred-tool problem in `brainstorming` and `grill-me`. See `CHANGELOG.md`.
 
-This plugin is an opinionated curation. Requests to re-bloat it toward the upstreams (full Akka.NET, Aspire, etc.) will be declined — install those upstreams directly. PRs welcome for SKILL.md fixes, `AskUserQuestion` / domain-first / executing-plans refinements, and additional quality gates reinforcing "patterns over TDD-discovery."
+This plugin is an opinionated curation. Requests to re-bloat it toward the full upstreams (Akka.NET, Mailpit, DocFX, Roslyn generators) will be declined — install those upstreams directly. PRs welcome for SKILL.md fixes, `AskUserQuestion` / domain-first / executing-plans refinements, and additional quality gates reinforcing "patterns over TDD-discovery."

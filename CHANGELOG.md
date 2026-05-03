@@ -4,7 +4,47 @@ All notable changes to DotLightSkillset will be documented in this file.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.3.0] — 2026-05-03
+
+### Added — Aspire is back
+
+Six skills and three agents from [Aaronontheweb/dotnet-skills](https://github.com/Aaronontheweb/dotnet-skills) v1.3.2 are now bundled. v0.1.0 explicitly excluded these on the assumption that Aspire users would install the upstream alongside; in practice that meant maintaining two plugins (and missing curation benefits). Real-world projects (e.g. .NET 10 + Aspire + Postgres/TimescaleDB + NHibernate + Vue/Vite) actually use this surface as their primary integration-testing lever, so it belongs in dotlight.
+
+**New `dotnet/` skills:**
+- `aspire-configuration` — AppHost as the explicit env-var bridge; app code free of Aspire clients/service-discovery
+- `aspire-service-defaults` — shared OpenTelemetry / health checks / resilience / service discovery setup
+- `aspire-integration-testing` — `DistributedApplicationTestingBuilder` with xUnit, dynamic ports, parallel isolation; **the primary lever for parallel integration tests** in Aspire projects (with `advanced-patterns.md` + `ci-and-tooling.md` reference files)
+- `opentelemetry-instrumentation` — ActivitySource/Meter patterns, semantic conventions, zero-allocation hot paths *(renamed from upstream `opentelementry-dotnet-instrumentation` typo)*
+- `ilspy-decompile` — inspect compiled .NET assemblies via `ilspycmd` / `dnx ilspycmd`
+- `playwright-blazor-testing` — UI tests for Blazor Server/WASM with Playwright *(renamed from upstream `playwright-blazor`)*
+
+**New `agents/` directory** (Claude Code's standard `agents/` location at the plugin root):
+- `dotnet-performance-analyst` — JetBrains profiler + BenchmarkDotNet result interpretation, regression detection, hot-path delegate allocation analysis
+- `dotnet-benchmark-designer` — BenchmarkDotNet design patterns and when custom harnesses beat BDN
+- `dotnet-concurrency-specialist` — race conditions, async/await pitfalls, synchronization primitives, deadlock diagnosis
+
+### Fixed
+
+- **`brainstorming` and `grill-me` now load `AskUserQuestion` correctly.** In Claude Code 2.x+, `AskUserQuestion` is a *deferred* tool — it's listed in a `<system-reminder>` block but its parameter schema is not loaded by default, so calling it fails with `InputValidationError` and the model silently degrades to text "Option A / B / C" lists. Both skills now instruct the model to call `ToolSearch` with `"select:AskUserQuestion"` once at session start. This was the original motivation for forking from upstream and was previously broken.
+
+### Changed
+
+- `plugin.json` and `marketplace.json` are now both bumped to `0.3.0`. **Both `version` fields must move together at every release** — the marketplace catalog reads `marketplace.json` for `/plugin marketplace update` to detect new versions, while `plugin.json` is read post-install. v0.2.0 only bumped one of them, which silently broke the upgrade flow.
+- README updated: removed the "If you're on Aspire, install the full upstream instead" disclaimer; added a *Companion plugins* section recommending [VoltAgent](https://github.com/VoltAgent/awesome-claude-code-subagents) (`voltagent-data-ai` for ML/data agents like `postgres-pro`, `database-optimizer`) and `playwright@claude-plugins-official` for general UI testing.
+- Skill counts: workflow stays at 15. .NET patterns: **24** (was 18). Specialized agents: **3** (was 0). Total surface: 42 entries.
+- `THIRD_PARTY_LICENSES.md` updated for new dotnet skills/agents counts and the editorial renames.
+
+### Excluded (still)
+
+Same as before, plus newly-noticed agents:
+
+- Superpowers: `subagent-driven-development`
+- dotnet-skills (skills): all `akka-*` (5), `aspire-mailpit-integration`, `mjml-email-templates`, `verify-email-snapshots`, `marketplace-publishing`, `skills-index-snippets`
+- dotnet-skills (agents): `akka-net-specialist`, `docfx-specialist`, `roslyn-incremental-generator-specialist`
+
+For those, install upstream alongside — they cooperate fine.
+
+## [0.2.0] — 2026-04-27
 
 ### Added
 
