@@ -4,6 +4,51 @@ All notable changes to DotLightSkillset will be documented in this file.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] — 2026-05-04
+
+### Added — 3 workflow skills, 1 new upstream attribution
+
+Three new `superpowers/` skills land in 0.5.0, drawing on the latest mattpocock/skills work and Jan Smejkal's hsmejky/skills fork (a fourth upstream library now bundled).
+
+#### `superpowers/grill-with-docs` — doc-aware sibling of `grill-me`
+
+Adapted from [mattpocock/skills/engineering/grill-with-docs](https://github.com/mattpocock/skills) (MIT, © 2026 Matt Pocock). Same Socratic interrogation as `grill-me`, plus three new capabilities:
+
+- **Glossary cross-check** — when the user uses a term, check it against the project's glossary and flag conflicts immediately
+- **Code cross-reference** — when the user describes "how the system works", verify against the code (uses `mcp__rider__*` semantic ops when Rider MCP is attached, per `rider-mcp-first`)
+- **Inline doc updates** — write resolved terminology to the glossary as it crystallises; offer ADRs only when the decision is hard-to-reverse + surprising + a real trade-off
+
+**Adaptations from upstream:**
+- **Path discovery** instead of hardcoded `CONTEXT.md` + `docs/adr/`. Probes in order: `CONTEXT.md` → `CONTEXT-MAP.md` → `project_conventions.md` → `docs/glossary.md` → `docs/architecture.md` → `Resources/Specifications/V*_Architecture_Definition.md` → `CLAUDE.md`. ADR location detection: `docs/adr/*.md` → `docs/decisions/*.md` → `Resources/Specifications/*Decisions*.md`. Detects existing numbering scheme (`0001-x.md` vs `ADR-001`) and matches it.
+- **.NET domain-first checklist** (aggregates, FK cardinality, idempotency, partial failure, observability) — same as our `grill-me` modification.
+- **`AskUserQuestion` deferred-tool preload** directive — preserves the clickable-card UX rather than degrading to text "1, 2, 3" lists.
+- **Two reference files** (`CONTEXT-FORMAT.md`, `ADR-FORMAT.md`) ported with .NET annotations and explicit support for laisa2-style single-file ADR logs (`V*_Decisions.md` with `## ADR-NNN` sections).
+
+#### `superpowers/improve-architecture` — Ousterhout-style deep-modules audit
+
+Adapted from [hsmejky/skills/improve-architecture](https://github.com/hsmejky/skills) (MIT, © 2026 Jan Smejkal — fork modifications; © 2026 Matt Pocock — original work). Built on Ousterhout's *A Philosophy of Software Design* (deep vs shallow modules) and Feathers' seam terminology. Disciplined vocabulary (Module / Interface / Depth / Seam / Adapter / Leverage / Locality), explicit deletion test, parallel sub-agent design when alternative interfaces need exploration.
+
+**Adaptations from upstream:**
+- **`AskUserQuestion` deferred-tool preload** for steps 3 (candidate list) and 4 (grilling loop).
+- **`Explore` subagent fallback** note — falls back to `general-purpose` with explicit "read-only investigation" brief if `Explore` isn't registered.
+- **.NET-specific deepening patterns section** — common shallow-module shapes in .NET projects worth flagging during exploration: `*Service` + `*Repository` + `*Mapper` triplets, `I*Provider` interfaces with one implementation, three-layer Endpoint/Service/Repository pass-through, `AutoMapper` profiles for near-identical types, `IOptions<T>` injected into one consumer, NHibernate `IRepository<T>` exposing CRUD 1:1, Aspire `ServiceDefaults` extension methods wrapping a single SDK call.
+- **Cross-references** to dotlight skills: `brainstorming` (for new designs), `design-an-interface` (lighter standalone variant of the parallel sub-agent pattern), `grill-me` / `grill-with-docs` (Socratic stress-test of an existing draft), `dotnet-performance-analyst` (delegate measurement when a candidate is performance-driven), `csharp-type-design-performance` (informs the shape of deep .NET modules), `rider-mcp-first` (use Rider semantic ops, not `Grep`, for the exploration step).
+- Reference files (`LANGUAGE.md`, `DEEPENING.md`, `INTERFACE-DESIGN.md`) ported verbatim.
+
+#### `superpowers/caveman` — explicit-trigger ultra-compressed mode
+
+Body adapted from [hsmejky/skills/caveman](https://github.com/hsmejky/skills) (MIT, dual-attributed). Bullets-only, ≤8 words/bullet, UTF substitutions (→, ⇒, ∴, ✓, ✗, etc.), persistent across responses until explicitly turned off. Saves ~75% of response tokens for users who want maximally terse Claude.
+
+**Description tightened from upstream:** trigger phrases narrowed to **explicit mode-switches only** — `"caveman mode"`, `"talk like caveman"`, `"use caveman"`, `/caveman`. Upstream description included ambiguous shortcuts like `"be brief"`, `"shorter responses"`, `"less verbose"`, `"be terse"` which risk accidental permanent activation when the user is making a routine conversational request rather than switching modes. Body unchanged.
+
+### Changed
+
+- **`superpowers/grill-me`** gains a cross-reference: when the project has a glossary file or ADR log, prefer `grill-with-docs` instead — it does the same Socratic interrogation but cross-checks terminology against the glossary and writes resolutions back into the docs.
+- **`superpowers/design-an-interface`** is preserved (variant A): mattpocock deprecated it upstream because the parallel sub-agent pattern lives on inside `improve-architecture/INTERFACE-DESIGN.md`, but we keep the standalone shortcut in dotlight. Both have legitimate use cases — `design-an-interface` is a lighter standalone invocation, `improve-architecture/INTERFACE-DESIGN.md` is the same idea integrated into a full architectural review.
+- `THIRD_PARTY_LICENSES.md` adds **hsmejky/skills as a 4th upstream attribution** — the LICENSE preserves dual copyright (Matt Pocock for original work, Jan Smejkal for fork modifications), both must be preserved in any redistribution.
+- `plugin.json` and `marketplace.json` both bumped to `0.5.0` (synchronous as always).
+- Workflow skills count: **18** (was 15).
+
 ## [0.4.2] — 2026-05-04
 
 ### Added — `aspire-mcp-first`

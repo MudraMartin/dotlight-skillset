@@ -8,7 +8,7 @@ Combines three upstream MIT skill libraries into one opinionated bundle, with wo
 
 ## What it bundles
 
-- **Workflow (15 skills)** — customized fork of [obra/superpowers](https://github.com/obra/superpowers) plus two adapted skills from [mattpocock/skills](https://github.com/mattpocock/skills) (`grill-me`, `design-an-interface`): brainstorming → writing-plans → executing-plans → TDD → code review → finishing-branch, plus worktrees, systematic-debugging, parallel agents, skill authoring, design-stress-testing, and parallel interface design.
+- **Workflow (18 skills)** — customized fork of [obra/superpowers](https://github.com/obra/superpowers) plus four adapted skills from [mattpocock/skills](https://github.com/mattpocock/skills) (`grill-me`, `design-an-interface`, `grill-with-docs`) and two from [hsmejky/skills](https://github.com/hsmejky/skills) (`improve-architecture`, `caveman`): brainstorming → writing-plans → executing-plans → TDD → code review → finishing-branch, plus worktrees, systematic-debugging, parallel agents, skill authoring, doc-aware grilling (`grill-with-docs`), Ousterhout-style architecture review (`improve-architecture`), and explicit-trigger ultra-terse mode (`caveman`).
 - **.NET patterns (26 skills)** — curated fork of [Aaronontheweb/dotnet-skills](https://github.com/Aaronontheweb/dotnet-skills): C# standards, Minimal API design, DI, configuration, serialization, Aspire (4 skills — configuration, service-defaults, integration-testing, **mcp-first** for runtime debugging), OpenTelemetry, Testcontainers, Playwright (Blazor + CI caching), ILSpy decompilation, quality gates (slopwatch + CRAP). Plus dotlight-original **`rider-mcp-first`** — when JetBrains Rider MCP is attached, force semantic operations over filesystem Grep/Read for **50–90 % token savings on .NET exploration**.
 - **Specialized .NET agents (3)** — `dotnet-performance-analyst`, `dotnet-benchmark-designer`, `dotnet-concurrency-specialist`. Use the `Agent` tool with `subagent_type` matching the agent name.
 
@@ -87,13 +87,15 @@ Then drag-drop or use your client's plugin install flow.
 
 ## What's in the plugin
 
-### Workflow (15 skills)
+### Workflow (18 skills)
 
 | Skill | Role |
 |---|---|
 | `brainstorming` | Socratic design refinement — **uses `AskUserQuestion`** + enforces domain-first design |
-| `grill-me`† | Stress-test an existing plan/spec — branch-by-branch interrogation with recommended answers |
-| `design-an-interface`† | Generate 3–4 radically different designs in parallel, then compare on depth and ease of correct use |
+| `grill-me`† | Stress-test an existing plan/spec — branch-by-branch interrogation with recommended answers. Cross-references to `grill-with-docs` when project has docs. |
+| `grill-with-docs`† 🆕 | Doc-aware grilling — same Socratic discipline, plus glossary cross-check, code cross-reference, inline updates to glossary / ADRs. Path discovery for any project layout. |
+| `improve-architecture`‡ 🆕 | Ousterhout-style audit — find shallow modules, propose deepening opportunities. Disciplined vocabulary (Module / Interface / Depth / Seam / Adapter / Leverage / Locality), deletion test, parallel sub-agent design when needed. |
+| `design-an-interface`† | Generate 3–4 radically different designs in parallel, then compare on depth and ease of correct use. (Lighter standalone variant of `improve-architecture/INTERFACE-DESIGN.md`.) |
 | `writing-plans` | Bite-sized plan — **requires `## Domain Model`** or loops back |
 | `executing-plans` | Batch execution with human checkpoints (preferred exec mode) |
 | `test-driven-development` | RED-GREEN-REFACTOR with domain-model guard |
@@ -104,10 +106,11 @@ Then drag-drop or use your client's plugin install flow.
 | `dispatching-parallel-agents` | Parallel subagents for independent tasks |
 | `using-git-worktrees` | Parallel development for larger features |
 | `finishing-a-development-branch` | Merge/PR/keep/discard decision flow |
+| `caveman`‡ 🆕 | Ultra-compressed response mode (~75% token savings, bullets-only, UTF substitutions). **Activates ONLY on explicit trigger** ("caveman mode" / "/caveman") — tightened from upstream to avoid accidental activation on phrases like "be brief". |
 | `writing-skills` | Author new skills |
 | `using-superpowers` | Intro to the system |
 
-† Adapted from [mattpocock/skills](https://github.com/mattpocock/skills); the rest are from [obra/superpowers](https://github.com/obra/superpowers).
+† Adapted from [mattpocock/skills](https://github.com/mattpocock/skills); ‡ adapted from [hsmejky/skills](https://github.com/hsmejky/skills) (a fork of mattpocock — both attributions preserved); the rest are from [obra/superpowers](https://github.com/obra/superpowers).
 
 ### .NET patterns (26 skills)
 
@@ -272,11 +275,14 @@ Combines modified forks of three upstream MIT projects, with all licenses preser
 
 - **[obra/superpowers](https://github.com/obra/superpowers)** — © 2025 Jesse Vincent / Prime Radiant
 - **[Aaronontheweb/dotnet-skills](https://github.com/Aaronontheweb/dotnet-skills)** — © 2025 Aaron Stannard
-- **[mattpocock/skills](https://github.com/mattpocock/skills)** — © 2026 Matt Pocock (`grill-me` and `design-an-interface` only)
+- **[mattpocock/skills](https://github.com/mattpocock/skills)** — © 2026 Matt Pocock (`grill-me`, `design-an-interface`, `grill-with-docs`)
+- **[hsmejky/skills](https://github.com/hsmejky/skills)** — © 2026 Jan Smejkal (fork modifications) + © 2026 Matt Pocock (original work, preserved) (`improve-architecture`, `caveman`)
 
 When redistributing (fork, rebrand, package), all license files must remain.
 
 ## Contributing & status
+
+**v0.5.0 — `grill-with-docs` + `improve-architecture` + `caveman`.** Three new workflow skills with `AskUserQuestion` clickable-card preload. `grill-with-docs` is the doc-aware sibling of `grill-me` — cross-checks user terminology against the project glossary (with path discovery for `CONTEXT.md` / `project_conventions.md` / `Resources/Specifications/V*_*.md`), cross-references claims with the code, writes resolutions back into the docs (inline glossary + ADR offers when justified). `improve-architecture` is an Ousterhout-style deep-modules audit with disciplined vocabulary and `.NET`-specific deepening patterns. `caveman` is an explicit-trigger ultra-compressed response mode (bullets only, ≤8 words/bullet, UTF substitutions). Trigger description tightened from upstream — only activates on explicit phrases like "caveman mode" / "/caveman", not on ambiguous shortcuts like "be brief". Added `hsmejky/skills` as 4th upstream attribution.
 
 **v0.4.2 — `aspire-mcp-first` + sharper `rider-mcp-first` invocation.** New skill `aspire-mcp-first` for the Aspire CLI MCP server (`aspire agent mcp` / `aspire mcp init`) — when AppHost is running, runtime queries (resource state, logs, traces, dynamic endpoints) go through `mcp__aspire__*` instead of `docker logs` and port-guessing. `rider-mcp-first` description rewritten as imperative + body lead now demands an immediate tool-list scan and adds a per-call gate, fixing the persistent fallback-to-`Grep` leak.
 

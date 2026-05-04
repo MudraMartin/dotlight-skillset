@@ -19,6 +19,8 @@ Use this when the input already exists:
 
 **Do not use this** to *generate* a design from a blank slate — that's `brainstorming`. If the user has nothing concrete yet, hand off to `brainstorming` first.
 
+**If the project has a glossary file (`CONTEXT.md` / `project_conventions.md` / `Resources/Specifications/V*_Architecture_Definition.md`) OR an ADR log (`docs/adr/*.md` / `Resources/Specifications/*Decisions*.md`), prefer `grill-with-docs`** — it does the same Socratic interrogation but cross-checks user terminology against the glossary, cross-references claims with the code, and writes resolutions back into the docs (inline glossary updates + ADR offers when justified). Use plain `grill-me` only when no documentation infrastructure exists.
+
 ## How to grill
 
 1. **Read the artifact.** Find the spec / plan / message the user is asking you to grill. If it's not obvious, ask which one.
