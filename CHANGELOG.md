@@ -4,6 +4,22 @@ All notable changes to DotLightSkillset will be documented in this file.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.1] — 2026-05-04
+
+### Fixed — `rider-mcp-first` projectPath discipline
+
+The 0.4.x skill was correct that `projectPath` is the solution folder, not the repo root, but it didn't say strongly enough that `projectPath` must always be passed explicitly, must never be guessed, and must be discovered via `get_solution_projects` when uncertain. Reported failure mode: subagents (and sometimes the main loop) call `mcp__rider__*` tools without `projectPath` or with a guessed value, get back `"doesn't correspond to any open project"`, burn a tool call, and risk falling back to filesystem `Grep` after a few retries — defeating the whole skill.
+
+Three new sections in `rider-mcp-first/SKILL.md`:
+
+1. **Three rules** — (1) always pass `projectPath` explicitly, (2) discover via `get_solution_projects` before guessing, (3) treat `CLAUDE.md`'s documented `projectPath` as authoritative.
+2. **Subagent dispatch rule** — when dispatching via the `Agent` tool, the prompt MUST include the `projectPath` value explicitly. Subagents don't inherit cwd or conversational context — without an explicit value they will guess (often wrong) or rationalize their way to filesystem. This is the single most common Rider MCP failure mode reported in practice.
+3. **Multi-project workflows** — when the user has multiple .NET repos (e.g. `c:/Pool/laisa2`, `c:/Pool/projector`) but Rider has only **one** loaded at a time, every Rider call against the wrong solution fails with the same error even though the path is correct. The skill now diagnoses this as a **runtime state mismatch** (not a path-guessing bug), tells the user explicitly which solution Rider has loaded vs which they're working in, and falls back to filesystem only after that diagnosis (not as a reflexive retry).
+
+### Changed
+
+- `plugin.json` and `marketplace.json` both bumped to `0.5.1` (synchronous as always).
+
 ## [0.5.0] — 2026-05-04
 
 ### Added — 3 workflow skills, 1 new upstream attribution

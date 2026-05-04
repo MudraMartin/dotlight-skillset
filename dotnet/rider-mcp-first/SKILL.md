@@ -75,14 +75,42 @@ The Rider MCP server runs **inside** the Rider IDE process. Claude Code does not
 
 If the user reports `mcp__rider__*` is missing, the diagnosis order is: (1) is Rider open? (2) is the solution actually loaded in Rider? (3) does the registered endpoint URL match what Rider exposes? (typically `http://127.0.0.1:64342/stream` for newer JetBrains MCP, `/sse` for older)
 
-## projectPath quirk
+## projectPath discipline (read this carefully — most common failure)
 
-For Rider MCP tools, `projectPath` is the **solution folder** (the directory containing `.sln` or `.slnx`), not the repo root.
+For Rider MCP tools, `projectPath` is the **solution folder** (the directory containing `.sln` or `.slnx`), not the repo root, not a subproject folder, not the cwd of your shell.
 
 - ✅ `c:/Pool/laisa2/Solution` (contains `LAISA.slnx`)
-- ❌ `c:/Pool/laisa2` (repo root — Rider returns errors)
+- ❌ `c:/Pool/laisa2` (repo root — Rider returns *"doesn't correspond to any open project"*)
+- ❌ `c:/Pool/laisa2/Solution/LAISA.AppHost` (subproject — same error)
+- ❌ `c:/Pool/<guessed-from-prefix>` (hallucinated path — same error and a wasted tool call)
 
-When in doubt, run `mcp__rider__get_solution_projects` first to confirm the solution is loaded.
+### Three rules
+
+1. **Always pass `projectPath` explicitly** in every `mcp__rider__*` call that accepts it. Do NOT rely on Rider to infer it from your cwd or the conversation context — it can't, and an unspecified call fails the same way as a wrong one.
+2. **When unsure, discover before guessing.** Call `mcp__rider__get_solution_projects` first — it returns the list of solutions currently loaded in Rider. One result → that's your `projectPath`. Multiple → ask the user. Zero → Rider has no solution loaded; ask the user to open one and stop using Rider tools until they confirm.
+3. **The canonical `projectPath` is documented in the project's `CLAUDE.md`** — check there first. Common patterns: `c:/Pool/<repo>/Solution`, `c:/Pool/<repo>/src`, `c:/Pool/<repo>` (only when `.sln` is at repo root). Treat the value in `CLAUDE.md` as authoritative; don't extrapolate from other repos.
+
+### Multi-project workflows
+
+If the user works on multiple .NET projects (e.g. `c:/Pool/laisa2`, `c:/Pool/projector`, `c:/Pool/foo`), Rider may have only **one** of them loaded at a time — the MCP server is per-Rider-instance. When the project under cwd is correct (`projectPath=c:/Pool/projector`) but Rider is currently open on a *different* solution (e.g. laisa2), every Rider call fails with *"doesn't correspond to any open project"* even though the path itself is right.
+
+This is **not a path-guessing bug** — it's a **runtime state mismatch**. The fix is not to retry with a different path; it's to:
+
+1. Call `mcp__rider__get_solution_projects` (no `projectPath` needed) to see what Rider actually has loaded right now
+2. If it's the wrong solution, tell the user explicitly: *"Rider has `<X>` loaded, but this session is in `<Y>`. Open `<Y>` in Rider (or a second Rider instance) and I'll be 50–90% more efficient. Until then, falling back to filesystem tools."*
+3. Don't loop retrying the same `projectPath` hoping it'll suddenly work — the user has to switch Rider's loaded solution
+
+This also means in multi-project workflows, the skill SHOULD fall back to filesystem when the wrong Rider is loaded — that's not the rationalization Red Flag (below), it's a legitimate diagnosis. The Red Flag is falling back when Rider IS attached to the right solution.
+
+### Subagent dispatch rule
+
+When you dispatch a subagent (via the `Agent` tool with `subagent_type=Explore` or any other type) that will use `mcp__rider__*` tools, **the dispatch prompt MUST include the `projectPath` value explicitly** — e.g. *"Use `projectPath=c:/Pool/laisa2/Solution` for all Rider MCP calls."*
+
+The subagent does NOT inherit cwd or conversational context from the parent — it only sees the prompt you write. Without an explicit `projectPath`, it will:
+- Either guess based on a fragment of context it does see (often wrong) and burn tool calls on `"doesn't correspond to any open project"` errors
+- Or rationalize its way to filesystem `Grep` / `Read` (the exact regression this skill exists to suppress — see Red Flags below)
+
+This is the single most common Rider MCP failure mode reported in practice. Cost is small individually (one wasted tool call per attempt), large in aggregate when subagents fall back to filesystem.
 
 ## Red Flags — STOP if you think:
 
