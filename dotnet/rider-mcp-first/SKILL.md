@@ -9,12 +9,51 @@ description: MANDATORY before ANY Grep/Read/Glob/Edit on files inside a .NET sol
 **STOP. Before reading further, scan your current tool list for any tool name starting with `mcp__rider__`.**
 
 - **If present** → you ABSOLUTELY MUST follow this skill for every file operation inside the solution folder. Reflexive `Grep` / `Read` / `Glob` / `Edit` on `.cs`, `.csproj`, `.sln`, `.slnx`, `.vue`, `.ts`, `.razor`, `.scss`, `.json` (when inside the solution) is a token leak. No exceptions for "this one's quick", "I'm just confirming", or "I'm more comfortable with Grep". The user pays for every wasted token.
-- **If absent** → tell the user once: *"Rider MCP not attached — open Rider on the solution and I'll be 50–90% more efficient."* Then proceed with filesystem tools. Do not pester them again.
+- **If absent** → **STOP and ask the user before any .NET file operation.** Do NOT silently fall back to filesystem — that is exactly the leak this skill exists to prevent. See the **Rider-not-attached gate** below.
 
 This skill is rigid, not flexible. The model has a strong reflex to fall back to `Grep` / `Read` because they are familiar. **That reflex is the bug this skill exists to suppress.** Filesystem tools answer "what bytes are here?". Rider tools answer "what does this code MEAN?" — and the second is what you actually need 90% of the time. The Rider MCP server has a pre-built ReSharper semantic index; your query returns ~100 tokens of answer instead of ~30 KB of file contents to scan.
 
 **Per-call gate.** Before *every single* `Grep` / `Read` / `Glob` / `Edit` call you are about to make, ask yourself: *"Is the target inside the solution folder, and is `mcp__rider__*` in my tool list?"* If yes to both, **switch to the Rider equivalent** (table below). This check takes one cheap thought; skipping it costs the user thousands of tokens.
 </EXTREMELY-IMPORTANT>
+
+## Rider-not-attached gate (CRITICAL — prevents silent token leak)
+
+When `mcp__rider__*` is **absent** from your tool list and the user has asked anything that involves .NET file operations (read, search, edit, refactor of `.cs` / `.csproj` / `.sln` / `.slnx` / `.vue` / `.ts` / `.razor` / `.scss` / `.json` inside the solution folder), **DO NOT silently fall back to `Grep` / `Read` / `Glob` / `Edit`**. Stop and ask the user — explicitly, clickable — what they want.
+
+### Why this matters
+
+A typical .NET exploration session burns **30–80K tokens** through filesystem fallback (multi-project Grep, full-file Reads to find one method, repeated globs to map the project layout). The user often has Rider running already — they just need to load the right solution, or the user just forgot. Silent fallback means the user pays the bill before noticing. **One question prevents the leak.**
+
+### The gate — implementation
+
+Before your first .NET file operation in the session, if `mcp__rider__*` is absent, ask the user via `AskUserQuestion` (preload it first if it's a deferred tool — see the `AskUserQuestion` preload note below). Three options, in this exact order:
+
+1. **(Recommended) "I'll open Rider — give me a moment"** — wait for the user to confirm Rider is open, then re-scan your tool list for `mcp__rider__*`. If now present, proceed with full Rider discipline. **Saves 50–90% of context tokens for the rest of the session.**
+2. **"Proceed with filesystem (`Grep` / `Read` / `Edit`) — much more expensive"** — explicit user opt-in to the leak. Proceed without further pestering. *Cost estimate: 30–80K tokens for typical exploration vs ~5–15K with Rider attached.*
+3. **"Skip the .NET work for now"** — exit gracefully, do not proceed with file operations. Useful when the user wants to reconsider or do something else first.
+
+If `AskUserQuestion` is unavailable (preload failed, deferred-tool list not loaded, or older Claude Code), fall back to a tight text question with the same three options — but **still ask, do not proceed silently**.
+
+### AskUserQuestion preload (Claude Code 2.x+)
+
+`AskUserQuestion` may be a *deferred* tool — listed in a `<system-reminder>` block but with its parameter schema not loaded by default. If so, calling it directly fails with `InputValidationError` and you'll fall back to text "1, 2, 3" lists, which the user has to read instead of clicking.
+
+**Before invoking the gate, call `ToolSearch` with query `"select:AskUserQuestion"` once per session.** No-op if already loaded or not deferred.
+
+### Persistence — don't pester
+
+Once the user has answered the gate, **honor the choice for the rest of the session.** Do not re-ask on every operation. If the user picked option 2 ("proceed with filesystem"), they know what they're paying for; respect that and proceed. If they picked option 1, re-scan tool list once they confirm Rider is open and proceed with Rider discipline.
+
+If the user explicitly says "stop asking about Rider" or similar, treat that as permanent opt-out for the session.
+
+### Subagent dispatch with no Rider
+
+If you are about to dispatch a subagent that will work on .NET files but `mcp__rider__*` is absent, **resolve the gate WITH THE USER FIRST in the parent session** — subagents don't have a back-channel to the user, and they will silently filesystem-fallback if asked. Once the user has chosen, brief the subagent in the dispatch prompt:
+
+- *"User has opened Rider — `projectPath=<value from get_solution_projects>`. Use `mcp__rider__*` for all .NET file ops."* (option 1)
+- *"User has opted into filesystem fallback for this session. Use `Grep` / `Read` / `Edit` — Rider is not available."* (option 2)
+
+Without explicit briefing, the subagent will guess and probably leak.
 
 ## Quick decision table
 

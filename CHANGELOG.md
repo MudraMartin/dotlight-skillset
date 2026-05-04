@@ -4,6 +4,24 @@ All notable changes to DotLightSkillset will be documented in this file.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.2] — 2026-05-04
+
+### Fixed — `rider-mcp-first` Rider-not-attached gate
+
+Up through 0.5.1 the skill said *"if `mcp__rider__*` is absent, tell the user once and proceed with filesystem"*. **In practice that's a silent leak**: the user often forgot to open Rider (or had the wrong solution loaded), the model dropped to `Grep` / `Read` immediately, and 30–80K context tokens were spent on filesystem exploration before anyone noticed. One typical .NET feature session = the user paying for one whole "Rider was actually closed" tax without ever being asked whether to proceed.
+
+0.5.2 replaces that with an **explicit gate via `AskUserQuestion`** before any .NET file operation when Rider isn't attached:
+
+1. **(Recommended) "I'll open Rider — give me a moment"** — model waits, re-scans tool list once user confirms, switches to full Rider discipline. *Saves 50–90% of session tokens.*
+2. **"Proceed with filesystem (much more expensive)"** — explicit opt-in. Cost estimate stated to user (30–80K tokens vs 5–15K with Rider). Model proceeds without re-asking.
+3. **"Skip the .NET work for now"** — graceful exit.
+
+Persistence: choice honored for the whole session, no pestering. Falls back to text question if `AskUserQuestion` is unavailable. **Subagent dispatch case explicitly addressed** — parent must resolve the gate WITH the user before dispatch (subagents have no back-channel and would otherwise silently filesystem-fallback when briefed without the gate decision).
+
+### Changed
+
+- `plugin.json` and `marketplace.json` both bumped to `0.5.2` (synchronous as always).
+
 ## [0.5.1] — 2026-05-04
 
 ### Fixed — `rider-mcp-first` projectPath discipline
