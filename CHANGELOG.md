@@ -4,6 +4,26 @@ All notable changes to DotLightSkillset will be documented in this file.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.3] — 2026-05-08
+
+### Fixed — `rider-mcp-first` drift recovery (closes two rationalization gaps)
+
+0.5.2 fixed the *front door* (Rider-not-attached gate via `AskUserQuestion`) but the *back door* was still open: even with the skill loaded and Rider attached, the model could drift from semantic operations to filesystem `Grep` / `Read` mid-session, and once drifted, every subsequent call inherited the precedent. Reported failure mode (verbatim from a model self-correction): *"the rationalizations I fell into are exactly what the skill warns against — 'I'll just Read this real quick', 'the modify-time pattern is already established'. That's the leak the skill exists to suppress."*
+
+Two specific gaps in `rider-mcp-first/SKILL.md` allowed the leak:
+
+1. **`Read`-variant of "real quick" wasn't named in Red Flags.** The table had *"I'll just `Grep` this real quick"* but no parallel row for `Read`. The model pattern-matched the `Grep` row and treated `Read` of one file as different. Same trap, just one tool over.
+2. **No Red Flag for path-dependence.** Once the first filesystem call slipped through (rationalized as one-off), every subsequent call got justified retroactively as *"I'm already in this mode, switching mid-stream would be inconsistent / churn."* The per-call gate caught the **first** drift but said nothing about **drift recovery** — what to do once you notice you've already drifted. The skill's silence here let sunk-cost reasoning take over and turned one slipped call into a session-long filesystem fallback.
+
+0.5.3 closes both:
+
+- **Per-call gate** (top `EXTREMELY-IMPORTANT` block) now explicitly states the gate keeps running *after* drift, with named-and-shamed sunk-cost language: *"do NOT rationalize 'consistency' or 'let me finish out the current sub-task in filesystem and switch later'. Switch to Rider on the very next call. There is no consistency-tax for switching tools mid-stream; the user pays nothing for that. They do pay, per call, for staying drifted."*
+- **Red Flags table** gains two rows: the `Read`-real-quick variant (named separately so the model can't pattern-match its way past it), and the path-dependence rationalization (*"I've already been using filesystem this session — switching is churn / breaks the established pattern"*) — labeled "the leak amplifier and the most expensive rationalization in this skill."
+
+### Changed
+
+- `plugin.json` and `marketplace.json` both bumped to `0.5.3` (synchronous as always).
+
 ## [0.5.2] — 2026-05-04
 
 ### Fixed — `rider-mcp-first` Rider-not-attached gate

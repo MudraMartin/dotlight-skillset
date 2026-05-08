@@ -14,6 +14,8 @@ description: MANDATORY before ANY Grep/Read/Glob/Edit on files inside a .NET sol
 This skill is rigid, not flexible. The model has a strong reflex to fall back to `Grep` / `Read` because they are familiar. **That reflex is the bug this skill exists to suppress.** Filesystem tools answer "what bytes are here?". Rider tools answer "what does this code MEAN?" — and the second is what you actually need 90% of the time. The Rider MCP server has a pre-built ReSharper semantic index; your query returns ~100 tokens of answer instead of ~30 KB of file contents to scan.
 
 **Per-call gate.** Before *every single* `Grep` / `Read` / `Glob` / `Edit` call you are about to make, ask yourself: *"Is the target inside the solution folder, and is `mcp__rider__*` in my tool list?"* If yes to both, **switch to the Rider equivalent** (table below). This check takes one cheap thought; skipping it costs the user thousands of tokens.
+
+**The gate runs every call — including after you've already drifted.** If you notice mid-session that you've used filesystem tools on solution files without checking, do NOT rationalize "consistency" or "let me finish out the current sub-task in filesystem and switch later." Switch to Rider on the *very next call*. Path-dependence is the most expensive rationalization in this skill — see the matching Red Flag row below.
 </EXTREMELY-IMPORTANT>
 
 ## Rider-not-attached gate (CRITICAL — prevents silent token leak)
@@ -156,6 +158,8 @@ This is the single most common Rider MCP failure mode reported in practice. Cost
 | Thought | Reality |
 |---|---|
 | "I'll just `Grep` this real quick" | Did you check if Rider is attached? `search_symbol` is faster AND saves the user's tokens. |
+| "I'll just `Read` this real quick" | Same trap as `Grep`, just one tool over. `mcp__rider__read_file` returns the same content but is solution-scoped and dedup'd. The "real quick" framing is the leak — every call adds 5–30 KB of context. The `Read`-variant is named explicitly because the model often pattern-matches the `Grep` row and thinks `Read` for one file is different. It isn't. |
+| "I've already been using filesystem this session — switching to Rider mid-stream would be inconsistent / churn / break the established pattern" | **Path-dependence is the leak amplifier and the most expensive rationalization in this skill.** Each filesystem call after the first inherits the precedent and gets justified retroactively. The moment you notice you drifted, switch to Rider on the *very next call* — do not "finish out the current sub-task" for consistency. Sunk-cost reasoning applied to context tokens is just throwing more tokens after wasted ones. There is no consistency-tax for switching tools mid-stream; the user pays nothing for that. They do pay, per call, for staying drifted. |
 | "`Read` is more familiar" | Familiarity ≠ correct. The user pays for context, not for your comfort. |
 | "Rider might not have indexed this" | It's a ReSharper index of an open solution. Of course it has. Try first, fall back if it actually fails. |
 | "Just one `Grep`, won't hurt" | Each `Grep` on a .NET solution averages 5–30 KB of context. `search_symbol` returns ~100 tokens. Compounds across a session. |
