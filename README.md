@@ -148,7 +148,7 @@ Then drag-drop or use your client's plugin install flow.
 | `ilspy-decompile` | Inspect compiled .NET assemblies via `ilspycmd` |
 | `rider-mcp-first` ⚡ | **EXTREMELY-IMPORTANT** — when JetBrains Rider MCP is attached, force `mcp__rider__*` semantic ops before Grep/Read/Edit. ~50–90 % token savings on .NET exploration. |
 | `dotnet-slopwatch` | Quality gate — detects LLM-generated anti-patterns |
-| `crap-analysis` | Quality gate — CRAP score, flags trivial tests |
+| `crap-analysis` | Quality gate — CRAP score, flags high-complexity untested code (risk hotspots) |
 
 ### Specialized .NET agents (3)
 
@@ -299,7 +299,7 @@ The plugin provides the skills — `CLAUDE.md` tells the agent when to use them.
 
 ### Token-budget hygiene
 
-Claude Code caps always-loaded skill metadata at ~1 % of the context window and silently drops the least-used descriptions when over budget. With dotlight's 49 skills plus any other plugins, check `/doctor` (listing cost + biggest contributors) and `/context` (actual size, exclusion warnings). On 200K-context models, consider raising the budget in `settings.json`:
+Claude Code caps always-loaded skill metadata at ~1 % of the context window and silently drops the least-used descriptions when over budget. With dotlight's 47 skills plus any other plugins, check `/doctor` (listing cost + biggest contributors) and `/context` (actual size, exclusion warnings). On 200K-context models, consider raising the budget in `settings.json`:
 
 ```json
 { "skillListingBudgetFraction": 0.02 }

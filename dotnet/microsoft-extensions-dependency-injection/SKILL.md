@@ -209,7 +209,7 @@ builder.Services.AddAkka("MySystem", (builder, sp) =>
 });
 ```
 
-See `akka-hosting-actor-patterns` skill for complete Akka.Hosting patterns.
+For complete Akka.Hosting patterns, install the upstream `dotnet-skills` plugin (its `akka-*` skills are deliberately excluded from dotlight).
 
 ---
 

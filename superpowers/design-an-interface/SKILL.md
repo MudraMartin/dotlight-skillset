@@ -92,7 +92,7 @@ Discuss in prose, not a table. Highlight where designs **diverge most** — that
 - **General-purpose vs. specialized.** Can it absorb the next plausible feature without a breaking change? Or is it focused so tightly that the focus itself is the value?
 - **Implementation efficiency.** Does the shape *allow* an efficient implementation? Or does it force allocation, double-iteration, awkward state machines?
 - **Ease of correct use vs. ease of misuse.** What's the "pit of success"? What's the foot-gun? What invariant *can't* the caller break by construction?
-- **Cost of getting it wrong.** If shipped to NuGet, what's the breaking-change cost in 6 months? See `csharp-api-design` for extend-only rules.
+- **Cost of getting it wrong.** If shipped to NuGet, what's the breaking-change cost in 6 months? See `api-design` for extend-only rules.
 
 Cross-reference relevant pattern skills when the comparison touches them:
 - Sealed/struct/record choice → `type-design-performance`.
