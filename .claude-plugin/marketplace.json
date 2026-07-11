@@ -9,7 +9,7 @@
     {
       "name": "dotlight-skillset",
       "source": "./",
-      "version": "0.8.0",
+      "version": "0.8.1",
       "description": "A lightweight curated Claude Code skillset for .NET developers — 0.8.0 rewrites all 18 remaining passive .NET pattern descriptions trigger-first ('Use when…') so the pattern layer actually auto-fires, adds maintenance/debug triggers (versioned-table defects, flaky tests), and honestly relabels api-design (NuGet/wire compat, not Minimal API). On 0.7.0: nhibernate-patterns (NH as first-class runtime). On 0.6.x: SessionStart hook, wired review chain, upstream sync, lazy-senior-dev, database-design-conventions + database-review.",
       "author": {
         "name": "Martin Mudra",

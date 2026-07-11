@@ -4,6 +4,16 @@ All notable changes to DotLightSkillset will be documented in this file.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.1] — 2026-07-11
+
+### Fixed — duplicate hook registration broke plugin load
+
+`/plugin marketplace update` on 0.8.0 reported: *"Duplicate hooks file detected: ./hooks/hooks.json resolves to already-loaded file … The standard hooks/hooks.json is loaded automatically, so manifest.hooks should only reference additional hook files."* Root cause: `hooks/hooks.json` at the plugin root is auto-discovered by convention, and 0.6.1 *also* registered it explicitly via `plugin.json`'s `"hooks"` key — a belt-and-suspenders choice that Claude Code treats as a duplicate, not a no-op. Removed the manifest key; the conventional file remains and loads automatically.
+
+### Changed
+
+- Both manifests bumped to `0.8.1` (synchronous as always).
+
 ## [0.8.0] — 2026-07-11
 
 ### Changed — every .NET pattern description rewritten trigger-first (the dispatch surface fix)
