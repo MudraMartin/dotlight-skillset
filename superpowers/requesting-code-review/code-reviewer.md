@@ -48,6 +48,7 @@ Subagent (general-purpose):
     - Extra: features that weren't requested, over-engineering, unneeded nice-to-haves — report as spec-compliance findings, not suggestions. Implementer rationales like "left it per YAGNI" never downgrade a finding.
     - Unforced scope creep is categorized Important or Critical — never a passing checklist note.
     - The opposite failure — minimalism abused against structure — is flagged Important too: new logic appended to a class whose job it doesn't share (God-class growth), business rules copy-pasted from elsewhere in the repo instead of a small enabling refactor to share them, or code reaching into another module's internal state or tables instead of its public seam. A smaller diff never justifies lower cohesion or hidden coupling.
+    - Quality-gate presence (.NET): the review request should include dotnet-slopwatch and crap-analysis results, and database-review results whenever the diff touches migrations, entities, or ORM mappings. Missing gate results for a diff that needs them → flag Important: "quality gates not run".
 
     **Code quality:**
     - Clean separation of concerns?

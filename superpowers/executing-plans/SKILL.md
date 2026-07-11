@@ -31,9 +31,13 @@ For each task:
 
 At each checkpoint, report `git diff --stat` against the plan's expected file list; flag unexpected files or outsized diffs to your human partner before continuing.
 
+**Review gate at each checkpoint (this IS the plan's per-batch review gate):**
+- **REQUIRED SUB-SKILL:** Use superpowers:requesting-code-review — dispatch the reviewer subagent per that skill AND run the .NET quality gates it names (`dotnet-slopwatch`, `crap-analysis`, and `database-review` when the batch touched migrations/entities/mappings) in this session.
+- The gate is run by you, the driver — not delegated to whoever implemented the batch. Loop on Critical findings (`receiving-code-review` → fix → re-review) until clean, then continue.
+
 ### Step 3: Complete Development
 
-After all tasks complete and verified:
+After all tasks complete and verified (including the plan's `## Final review` against the full spec):
 - Announce: "I'm using the finishing-a-development-branch skill to complete this work."
 - **REQUIRED SUB-SKILL:** Use superpowers:finishing-a-development-branch
 - Follow that skill to verify tests, present options, execute choice
@@ -69,4 +73,5 @@ After all tasks complete and verified:
 **Required workflow skills:**
 - **superpowers:using-git-worktrees** - Ensures isolated workspace (creates one or verifies existing)
 - **superpowers:writing-plans** - Creates the plan this skill executes
+- **superpowers:requesting-code-review** - The checkpoint review gate (plus dotnet-slopwatch / crap-analysis / database-review quality gates)
 - **superpowers:finishing-a-development-branch** - Complete development after all tasks

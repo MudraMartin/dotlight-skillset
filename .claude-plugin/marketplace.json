@@ -9,8 +9,8 @@
     {
       "name": "dotlight-skillset",
       "source": "./",
-      "version": "0.6.0",
-      "description": "A lightweight curated Claude Code skillset for .NET developers — 0.6.0 syncs all upstreams (superpowers v6.1.1, dotnet-skills v1.4.1), repairs three truncated core skills, adds lazy-senior-dev (anti-overengineering, adapted from ponytail), database-design-conventions (ActiveFrom/ActiveTo temporal versioning, one-schema-one-dialect) + database-review quality gate, persistence-first planning, and a description-budget token diet.",
+      "version": "0.6.1",
+      "description": "A lightweight curated Claude Code skillset for .NET developers — 0.6.1 makes the composition deterministic: SessionStart hook injects triage + skill discipline every session, the review chain (incl. database-review) is wired into skill bodies, and subagent briefs carry the workflow guarantees. On top of 0.6.0: upstream sync (superpowers v6.1.1, dotnet-skills v1.4.1), lazy-senior-dev, database-design-conventions + database-review, persistence-first planning.",
       "author": {
         "name": "Martin Mudra",
         "email": "martin.mudra@scalesoft.cz"

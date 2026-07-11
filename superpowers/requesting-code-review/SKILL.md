@@ -33,7 +33,7 @@ HEAD_SHA=$(git rev-parse HEAD)
 
 Dispatch a `general-purpose` subagent, filling the template at [code-reviewer.md](code-reviewer.md)
 
-For .NET work, also run the dotnet-slopwatch and crap-analysis quality gates; critical findings block merge.
+**Quality gates (run in THIS session, alongside the dispatch — the subagent cannot invoke skills):** for .NET work run `dotnet-slopwatch` and `crap-analysis`; when the diff touches migrations, tables, entities, or ORM mappings, also run `database-review`. Severity mapping onto the merge gate: slopwatch **Error** and **CRAP > 30 on changed code** count as Critical; slopwatch **Warning** and **CRAP 20–30** count as Important. Critical findings block merge (loop: `receiving-code-review` → `executing-plans`).
 
 **Placeholders:**
 - `{DESCRIPTION}` - Brief summary of what you built

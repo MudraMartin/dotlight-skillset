@@ -116,6 +116,17 @@ Return: Summary of what you found and what you fixed.
 
 Every dispatched subagent brief should state the cheapest model tier adequate for the task. An unnamed model silently inherits the session's most expensive one — one run put all 26 reviewers on the top tier.
 
+## The Brief Must Embed the Discipline
+
+Subagents inherit NO skills and NO conversation context — every rule you rely on exists for them only if your brief states it. Before dispatching implementation work, embed:
+
+- **Rider routing** (Rider-attached .NET sessions): the resolved `projectPath` value and "use `mcp__rider__*` for all .NET file ops" — per rider-mcp-first's subagent rule. Without it, subagents guess wrong or drift to filesystem Grep.
+- **The plan excerpt that governs the task**: the relevant `## Persistence Model` rows and designed invariants — plus "a test never justifies a schema deviation; schema changes not in the Persistence Model → stop and report back".
+- **Minimalism**: "implement the minimal version of the assigned task; no unrequested abstractions; reuse through public seams; every changed line traces to the task".
+- **What the parent will verify**: name the quality gates that will run on the result (slopwatch / crap-analysis / database-review), so the subagent doesn't ship what the gate will bounce.
+
+A brief without these produces work that silently violates the workflow's guarantees — it looks done and fails review.
+
 ## Common Mistakes
 
 **❌ Too broad:** "Fix all the tests" - agent gets lost

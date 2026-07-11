@@ -59,7 +59,10 @@ digraph brainstorming {
 }
 ```
 
-**The terminal state is invoking writing-plans.** Do NOT invoke frontend-design, mcp-builder, or any other implementation skill. The ONLY skill you invoke after brainstorming is writing-plans.
+**The terminal state is invoking writing-plans.** Do NOT invoke frontend-design, mcp-builder, or any other implementation skill. The ONLY exit to implementation is writing-plans — but two **design-side trips** are sanctioned before the design locks, and both loop back here:
+
+- **design-an-interface** — when the public surface is hard to change later (library API, Minimal API endpoint group, aggregate root): generate 3+ radically different designs in parallel before committing.
+- **grill-me** (or **grill-with-docs** when the project has a glossary/ADR docs) — when the user wants the design stress-tested ("grill harder", "poke holes") or the domain model feels thin.
 
 ## The Process
 
@@ -137,7 +140,7 @@ After the spec review loop passes, ask the user to review the written spec befor
 
 > "Spec written and committed to `<path>`. Please review it and let me know if you want to make any changes before we start writing out the implementation plan."
 
-Wait for the user's response. If they request changes, make them and re-run the spec review loop. Only proceed once the user approves.
+Wait for the user's response. If they request changes, make them and re-run the spec review loop. If they want it stress-tested harder, invoke `grill-me` (`grill-with-docs` when the project has a glossary/ADR docs) and fold the resolutions back into the spec. Only proceed once the user approves.
 
 **Implementation:**
 

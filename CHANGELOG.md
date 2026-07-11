@@ -4,6 +4,21 @@ All notable changes to DotLightSkillset will be documented in this file.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.1] — 2026-07-11
+
+### Fixed — composition wiring (top findings of the 5-lens fair review)
+
+A five-reviewer audit (coherence, dispatch reality, scenario traces, stack fit, self-consistency) found the plugin's intermittent failures were **wiring, not architecture**: the connective tissue lived in the README (never loaded) or in probabilistic description-firing. 0.6.1 moves it into deterministic carriers:
+
+- **SessionStart hook (NEW — first hook in the plugin).** `hooks/hooks.json` + `hooks/session-context.md` inject the triage rule, skill-discipline law, review-gate list, and AskUserQuestion preload pointer as literal text every session (startup/resume/clear/compact). Exec-form `cat` via `${CLAUDE_PLUGIN_ROOT}` — no shell interpretation, Windows-safe, ~250 tokens, does not count against the skill-listing budget. This restores the guarantee upstream obra provides via its own SessionStart hook and closes the #1 root cause: the entry gate (triage + "1% chance → invoke the skill") was itself only probabilistically loaded, so identical tasks took a clean or ceremony-heavy path depending on one un-forced invocation.
+- **Review chain wired into skill bodies** (was README-only): `executing-plans` checkpoints now REQUIRE `requesting-code-review` and name all three .NET quality gates, reconciling the per-batch driver-run gate from writing-plans with the per-task reviewer dispatch; `requesting-code-review` now names `database-review` (the 0.6.0 flagship gate was absent from the canonical "also run" line — schema diffs bypassed it) and defines the severity mapping onto the merge gate (slopwatch Error / CRAP > 30 = Critical; Warning / CRAP 20–30 = Important); `code-reviewer.md` gains a gate-presence check (missing gate results for a diff that needs them → Important finding).
+- **Subagent briefs carry the discipline**: `dispatching-parallel-agents` gains "The Brief Must Embed the Discipline" — Rider projectPath, the governing Persistence Model excerpt, minimalism rules, and the gates the parent will run. Generalizes rider-mcp-first's proven subagent rule to all dispatch (subagents inherit no skills; a brief without the rules produces work that silently violates every guarantee).
+- **Design side-trips integrated, not deleted** (maintainer decision — grill-me/grill-with-docs/design-an-interface are actively used): `brainstorming`'s terminal rule no longer suppresses them; both are sanctioned pre-lock side-trips that loop back, and the user-review gate offers grilling explicitly. This fixes the contradiction where the README flow routed to skills the brainstorming body forbade invoking.
+
+### Changed
+
+- `plugin.json` registers `"hooks": "./hooks/hooks.json"`; both manifests bumped to `0.6.1` (synchronous as always).
+
 ## [0.6.0] — 2026-07-11
 
 The largest release since 0.1.0: full upstream sync, a repaired foundation defect, an anti-overengineering layer, a designed-persistence layer, and an input-token diet. A 5th upstream attribution (DietrichGebert/ponytail) joins `THIRD_PARTY_LICENSES.md`.
