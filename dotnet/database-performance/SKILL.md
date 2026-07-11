@@ -1,6 +1,6 @@
 ---
 name: database-performance
-description: Database access patterns for performance. Separate read/write models, avoid N+1 queries, use AsNoTracking, apply row limits, and never do application-side joins. Works with EF Core and Dapper.
+description: Database access patterns for performance. Separate read/write models, avoid N+1 queries, apply row limits, and never do application-side joins. Works with EF Core, NHibernate (see per-rule NH notes), and Dapper.
 tags: [cqrs, performance, patterns]
 ---
 
@@ -23,7 +23,7 @@ Use this skill when:
 3. **Only retrieve what you need** - No SELECT *
 4. **Apply row limits** - Always have a configurable Take/Limit
 5. **Do joins in SQL** - Never in application code
-6. **AsNoTracking for reads** - EF Core change tracking is expensive
+6. **AsNoTracking for reads** - EF Core change tracking is expensive. (NH: ISession always tracks — use IStatelessSession, SetReadOnly, or DTO projection; see `nhibernate-patterns`.)
 
 ---
 
@@ -254,6 +254,8 @@ var orders = await _context.Orders
     .ToListAsync();
 ```
 
+NH: `session.Query<Order>().Fetch(o => o.Items)`, `batch-size` on the collection mapping, or Futures — see `nhibernate-patterns` (eager-fetching two bag collections throws "cannot simultaneously fetch multiple bags").
+
 ### Solution 2: Batch Query (Dapper)
 
 ```csharp
@@ -337,6 +339,8 @@ var product = await _context.Products
 // Result: 4 separate queries, ~125 rows total
 ```
 
+NH: no split query exists — use Futures (`.ToFuture()` batches the queries into one round trip), `batch-size`, or `fetch="subselect"`; see `nhibernate-patterns`.
+
 ### Solution: Explicit Projection
 
 ```csharp
@@ -382,6 +386,8 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
     }
 }
 ```
+
+NH: mapping-by-code equivalent — `Property(u => u.Email, m => { m.Length(254); m.NotNullable(true); })`, `m.Column(c => c.SqlType("text"))`; see `nhibernate-patterns`.
 
 ---
 
@@ -490,8 +496,8 @@ You can use both in the same project - EF Core for writes, Dapper for reads.
 | SELECT * | Project only needed columns |
 | N+1 queries | Use Include or batch queries |
 | Application joins | Do joins in SQL |
-| Cartesian explosion | Use AsSplitQuery or projection |
-| Tracking read-only data | Use AsNoTracking |
+| Cartesian explosion | Use AsSplitQuery or projection (NH: Futures / batch-size) |
+| Tracking read-only data | Use AsNoTracking (NH: IStatelessSession / projection) |
 | Generic repository | Purpose-built read/write stores |
 | Unbounded strings | Configure MaxLength in model |
 

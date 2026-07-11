@@ -5,6 +5,8 @@ description: Entity Framework Core best practices including NoTracking by defaul
 
 # Entity Framework Core Patterns
 
+**Scope: Entity Framework Core only.** NHibernate projects use `nhibernate-patterns` — the change-tracking, migration-CLI, ExecutionStrategy, and query-splitting guidance below does NOT transfer to NH (several rules invert: NH's ISession always tracks, and mutations persist on commit without any Update call).
+
 ## When to Use This Skill
 
 Use this skill when:

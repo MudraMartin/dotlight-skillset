@@ -9,8 +9,8 @@
     {
       "name": "dotlight-skillset",
       "source": "./",
-      "version": "0.6.1",
-      "description": "A lightweight curated Claude Code skillset for .NET developers — 0.6.1 makes the composition deterministic: SessionStart hook injects triage + skill discipline every session, the review chain (incl. database-review) is wired into skill bodies, and subagent briefs carry the workflow guarantees. On top of 0.6.0: upstream sync (superpowers v6.1.1, dotnet-skills v1.4.1), lazy-senior-dev, database-design-conventions + database-review, persistence-first planning.",
+      "version": "0.7.0",
+      "description": "A lightweight curated Claude Code skillset for .NET developers — 0.7.0 makes NHibernate a first-class runtime citizen: new nhibernate-patterns skill (session-per-request, IStatelessSession, dirty-checking writes, fetch strategies, HQL bulk, Npgsql jsonb/enum, FluentMigrator/DbUp) + NH annotations across the EF-flavored skills. On 0.6.x: SessionStart hook (deterministic triage + skill discipline), wired review chain, upstream sync, lazy-senior-dev, database-design-conventions + database-review.",
       "author": {
         "name": "Martin Mudra",
         "email": "martin.mudra@scalesoft.cz"

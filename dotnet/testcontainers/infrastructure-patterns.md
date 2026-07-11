@@ -296,7 +296,7 @@ public class DatabaseFixture : IAsyncLifetime
         {
             TablesToIgnore = new Table[]
             {
-                "__EFMigrationsHistory",
+                "__EFMigrationsHistory",   // NH projects: the runner's table instead — FluentMigrator "VersionInfo", DbUp "SchemaVersions"
                 "AspNetRoles",
                 "schema_version"
             },

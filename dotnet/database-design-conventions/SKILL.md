@@ -92,7 +92,7 @@ snake_case for all SQL identifiers (PascalCase lives in .NET entities only; use 
 
 ## Keys and Audit Columns
 
-Keys follow pg-aiguide's rule, restated: `bigint GENERATED ALWAYS AS IDENTITY` for internal PKs (never `serial`); `uuid` — generated as UUIDv7 — for externally-exposed identifiers and durable entity keys. Natural keys as `UNIQUE`, rarely as PK.
+Keys follow pg-aiguide's rule, restated: `bigint GENERATED ALWAYS AS IDENTITY` for internal PKs (never `serial`); `uuid` — generated as UUIDv7 — for externally-exposed identifiers and durable entity keys. Natural keys as `UNIQUE`, rarely as PK. (NH note: the `identity` generator forces a round-trip per INSERT and disables ADO.NET insert batching — batch-heavy NHibernate tables use a Postgres sequence with a pooled/hilo optimizer instead; see `nhibernate-patterns`.)
 
 Audit columns: `created_at timestamptz NOT NULL DEFAULT now()` + `created_by text NOT NULL` on every table. `updated_at`/`updated_by` ONLY on plain-mutable tables — never "everywhere just in case".
 
@@ -138,7 +138,7 @@ Full code samples in [temporal-versioning.md](temporal-versioning.md); the rules
 
 ## Boundaries
 
-- **Migration CLI mechanics** (commands, migration service): `efcore-patterns`. **Lock-safe SQL recipes** (`NOT VALID`/`VALIDATE`, `CREATE INDEX CONCURRENTLY`, batched backfills): pg-aiguide's `postgres-database-migration`.
+- **Migration CLI mechanics** (commands, migration service): `efcore-patterns` for the EF Core project. NHibernate has no migration CLI — schema evolves via FluentMigrator/DbUp/ordered SQL scripts (see `nhibernate-patterns`); `SchemaExport`/`SchemaUpdate` generate schema, they do not version it. **Lock-safe SQL recipes** (`NOT VALID`/`VALIDATE`, `CREATE INDEX CONCURRENTLY`, batched backfills): pg-aiguide's `postgres-database-migration`.
 - **Read-model shape, CQRS, query performance**: `database-performance`.
 - **Review-time enforcement** of everything here: `database-review` (this skill owns the catalog; the review flags deviations).
 - **Generic Postgres design + TimescaleDB mechanics**: the **pg-aiguide** companion plugin (recommended in README). Where its examples differ in style (`idx_` prefixes, unnamed indexes), the house prefixes above take precedence.

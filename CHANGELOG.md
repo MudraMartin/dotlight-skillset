@@ -4,6 +4,33 @@ All notable changes to DotLightSkillset will be documented in this file.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0] — 2026-07-11
+
+### Added — `nhibernate-patterns`: NH as a first-class runtime citizen
+
+Maintainer fact the stack-fit review surfaced: **most dotlight projects run NHibernate; only one runs EF Core** — yet ORM runtime coverage was EF-only, and several EF habits *invert* under NH into bugs (EF-NoTracking mental model → NH's accidental-UPDATE-by-dirty-check; spurious `session.Update()` calls → `NonUniqueObjectException`; `Include`/`AsSplitQuery` → nonexistent).
+
+New `dotnet/nhibernate-patterns` (SKILL.md + reference.md), sibling of `efcore-patterns`:
+
+- Core principles framed as EF-habit inversions; session-per-request DI (`ISessionFactory` singleton / `ISession` scoped, no `AddDbContext`), flush modes
+- `ISession` vs `IStatelessSession` decision table (the "AsNoTracking" question), writes without `Update()`
+- Fetch strategies (`batch-size` as default, `Fetch`/`FetchMany`, Futures, `subselect`), the multiple-bags trap
+- HQL/LINQ bulk DML + cache/event-listener bypass warnings; `adonet.batch_size` + the identity-generator batching trap (sequence + pooled-lo for batch-heavy tables)
+- LINQ-provider limits → QueryOver/HQL fallbacks; `LazyInitializationException` fixes; Polly instead of ExecutionStrategy
+- reference.md: mapping-by-code catalog, Npgsql `IUserType` for jsonb/arrays + `EnumStringType`, audit-column event listeners (and their non-firing under stateless/bulk paths), second-level + query cache rules, QueryOver cookbook
+- Boundaries: temporal mapping stays owned by `database-design-conventions` (this skill wires only the session-level `currentOnly` filter discipline); access patterns stay in `database-performance`
+
+### Fixed — existing skills no longer mislead NH projects (9 small edits)
+
+- `efcore-patterns` — explicit scope note: EF Core only, guidance does not transfer to NH
+- `database-performance` — description + Principle 6 + 4 inline NH annotations (Fetch/batch-size for `Include`, Futures for `AsSplitQuery`, mapping-by-code for `IEntityTypeConfiguration`, quick-ref rows)
+- `database-design-conventions` — Boundaries route NH schema evolution to FluentMigrator/DbUp (no NH migration CLI exists; `SchemaUpdate` is not a production migration path); Keys section notes the identity-vs-batching trap; `temporal-versioning.md` NH mapping gains `Precision(19)/Scale(4)` so it actually reproduces `numeric(19,4)`
+- `testcontainers` — NH note on the migration test (`SchemaExport`/runner instead of `MigrateAsync`); Respawn ignore-table note (FluentMigrator `VersionInfo` / DbUp `SchemaVersions`, not `__EFMigrationsHistory`)
+
+### Changed
+
+- Both manifests bumped to `0.7.0` (synchronous as always). .NET patterns count: **29**.
+
 ## [0.6.1] — 2026-07-11
 
 ### Fixed — composition wiring (top findings of the 5-lens fair review)

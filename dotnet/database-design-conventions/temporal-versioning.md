@@ -169,7 +169,7 @@ public sealed class PriceMapping : ClassMapping<Price>
         Table("prices");
         Id(p => p.Id, m => { m.Column("id"); m.Generator(Generators.Identity); });
         Property(p => p.ProductKey, m => m.Column("product_key"));
-        Property(p => p.Amount, m => { m.Column("amount"); m.Type(NHibernateUtil.Decimal); });
+        Property(p => p.Amount, m => { m.Column("amount"); m.Type(NHibernateUtil.Decimal); m.Precision(19); m.Scale(4); });
         Property(p => p.ActiveFrom, m => m.Column("active_from"));
         Property(p => p.ActiveTo, m => m.Column("active_to"));    // nullable DateTimeOffset?
         Filter("currentOnly", f => { });                          // condition from the filter-def

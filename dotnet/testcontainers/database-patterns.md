@@ -199,3 +199,5 @@ public class MigrationTests : IAsyncLifetime
     }
 }
 ```
+
+NH: there is no `MigrateAsync`/`CanConnectAsync` — run `new SchemaExport(cfg).Create(...)` for greenfield test schemas, or invoke the FluentMigrator/DbUp runner against the container connection string (see `nhibernate-patterns`).
