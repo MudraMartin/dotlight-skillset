@@ -1,6 +1,6 @@
 ---
 name: playwright-blazor-testing
-description: Write UI tests for Blazor applications (Server or WebAssembly) using Playwright. Covers navigation, interaction, authentication, selectors, and common Blazor-specific patterns.
+description: Use when writing or debugging Playwright UI tests for Blazor (Server or WebAssembly) — navigation, interaction, authentication, selectors, Blazor-specific patterns.
 ---
 
 # Testing Blazor Applications with Playwright

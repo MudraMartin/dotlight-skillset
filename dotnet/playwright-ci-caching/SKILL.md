@@ -1,6 +1,6 @@
 ---
 name: playwright-ci-caching
-description: Cache Playwright browser binaries in CI/CD pipelines (GitHub Actions, Azure DevOps) to avoid 1-2 minute download overhead on every build.
+description: Use when Playwright re-downloads browsers on every CI run — cache browser binaries in GitHub Actions / Azure DevOps and save 1-2 minutes per build.
 ---
 
 # Caching Playwright Browsers in CI/CD

@@ -1,6 +1,6 @@
 ---
 name: api-design
-description: Design stable, compatible public APIs using extend-only design principles. Manage API compatibility, wire compatibility, and versioning for NuGet packages and distributed systems.
+description: Use when designing or evolving a public API shipped as a NuGet package or a versioned wire contract — extend-only design, binary and wire compatibility, SemVer. Not about Minimal API endpoint design.
 ---
 
 # Public API Design and Compatibility

@@ -1,6 +1,6 @@
 ---
 name: database-design-conventions
-description: Use when designing or changing a database schema — tables, entities, mappings, migrations — on Postgres/TimescaleDB with EF Core or NHibernate. Lifecycle-pattern catalog (incl. ActiveFrom/ActiveTo versioning), naming, keys, normalization gate. One schema = one dialect.
+description: Use when designing or changing a database schema (tables, entities, mappings, migrations) AND when debugging query or data defects on versioned/temporal tables — Postgres/TimescaleDB with EF Core or NHibernate. Lifecycle-pattern catalog (ActiveFrom/ActiveTo versioning), naming, keys, normalization gate. One schema = one dialect.
 ---
 
 # Database Design Conventions

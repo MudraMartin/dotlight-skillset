@@ -1,6 +1,6 @@
 ---
 name: aspire-integration-testing
-description: Write integration tests using .NET Aspire's testing facilities with xUnit. Covers test fixtures, distributed application setup, endpoint discovery, and patterns for testing ASP.NET Core apps with real dependencies.
+description: Use when writing or debugging integration tests on an Aspire project — DistributedApplicationTestingBuilder with xUnit, test fixtures, endpoint discovery, real dependencies, parallel isolation.
 ---
 
 # Integration Testing with .NET Aspire + xUnit

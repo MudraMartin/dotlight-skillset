@@ -1,6 +1,6 @@
 ---
 name: database-performance
-description: Database access patterns for performance. Separate read/write models, avoid N+1 queries, apply row limits, and never do application-side joins. Works with EF Core, NHibernate (see per-rule NH notes), and Dapper.
+description: Use when designing data access or diagnosing slow queries — read/write model separation, N+1, row limits, SQL-side joins. Works with EF Core, NHibernate (per-rule NH notes), and Dapper.
 tags: [cqrs, performance, patterns]
 ---
 

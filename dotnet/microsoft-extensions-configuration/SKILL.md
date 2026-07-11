@@ -1,6 +1,6 @@
 ---
 name: microsoft-extensions-configuration
-description: Microsoft.Extensions.Options patterns including IValidateOptions, strongly-typed settings, validation on startup, and the Options pattern for clean configuration management.
+description: Use when wiring application configuration — the IOptions pattern, strongly-typed settings, IValidateOptions, validation on startup.
 ---
 
 # Microsoft.Extensions Configuration Patterns

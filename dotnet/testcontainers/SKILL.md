@@ -1,6 +1,6 @@
 ---
 name: testcontainers-integration-tests
-description: Write integration tests using TestContainers for .NET with xUnit. Covers infrastructure testing with real databases, message queues, and caches in Docker containers instead of mocks.
+description: Use when writing or debugging container-based integration tests — Testcontainers for .NET with xUnit, real databases/queues/caches in Docker instead of mocks, isolation and reset patterns.
 ---
 
 # Integration Testing with TestContainers

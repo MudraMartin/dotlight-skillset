@@ -4,6 +4,57 @@ All notable changes to DotLightSkillset will be documented in this file.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.0] — 2026-07-11
+
+### Changed — every .NET pattern description rewritten trigger-first (the dispatch surface fix)
+
+**Why this matters (the mechanism, precisely):** in Claude Code, only a skill's `name` + `description` are loaded at session start; the body loads *after* the model decides to invoke — and that decision is made from the description alone. A description like *"Entity Framework Core best practices including…"* is a **topic label**: it tells the model what the skill contains, not *when to reach for it*, so the model — which writes C# constantly and never pauses to invoke a "write good C#" skill — simply never fires it. The 0.6.x fair review (dispatch lens) identified this as failure cause #3: **the plugin's headline promise ("dotnet-skills supply the patterns") rested on ~18 skills with the weakest possible dispatch.** The workflow layer got trigger-first descriptions in 0.6.0; this release finishes the job on the pattern layer.
+
+**What exactly changed — all 18 rewritten descriptions** (form: passive topic label → `Use when <situation>` with front-loaded trigger keywords):
+
+| Skill | Old opening (passive) | New trigger |
+|---|---|---|
+| `aspire-configuration` | "Configure Aspire AppHost to emit…" | Use when wiring configuration between an Aspire AppHost and its services |
+| `aspire-integration-testing` | "Write integration tests using…" | Use when writing **or debugging** integration tests on an Aspire project |
+| `aspire-service-defaults` | "Create a shared ServiceDefaults project…" | Use when setting up or changing an Aspire ServiceDefaults project |
+| `crap-analysis` | "Analyze code coverage and CRAP scores…" | Use when running the CRAP quality gate at review time or auditing coverage risk |
+| `api-design` | "Design stable, compatible public APIs…" | Use when designing a public API shipped as a NuGet package or versioned wire contract — **explicitly "not about Minimal API endpoint design"** |
+| `modern-csharp-coding-standards` | "Write modern, high-performance C# code…" | Use when writing or reviewing C# code |
+| `type-design-performance` | "Design .NET types for performance…" | Use when designing .NET types with performance in mind |
+| `database-performance` | "Database access patterns for performance…" | Use when designing data access **or diagnosing slow queries** |
+| `dotnet-devcert-trust` | "Diagnose and fix .NET HTTPS dev certificate…" | Use when HTTPS dev-certificate trust fails on Linux or WSL2 |
+| `efcore-patterns` | "Entity Framework Core best practices…" | Use when working with EF Core (the EF Core project only — NH projects → nhibernate-patterns) |
+| `ilspy-decompile` | "Understand implementation details… Use when…" (trigger buried mid-text) | Use when you need to see inside a compiled .NET assembly (front-loaded) |
+| `dotnet-local-tools` | "Managing local .NET tools with…" | Use when installing or managing local .NET CLI tools |
+| `microsoft-extensions-configuration` | "Microsoft.Extensions.Options patterns including…" (no verb of use at all) | Use when wiring application configuration |
+| `dependency-injection-patterns` | "Organize DI registrations using…" | Use when organizing DI registrations |
+| `opentelemetry-instrumentation` | "Implement OpenTelemetry instrumentation…" | Use when adding or reviewing OpenTelemetry instrumentation |
+| `package-management` | "Manage NuGet packages using CPM…" | Use when adding, updating, or consolidating NuGet packages |
+| `playwright-blazor-testing` | "Write UI tests for Blazor applications…" | Use when writing **or debugging** Playwright UI tests for Blazor |
+| `playwright-ci-caching` | "Cache Playwright browser binaries…" | Use when Playwright re-downloads browsers on every CI run |
+| `dotnet-project-structure` | "Modern .NET project structure including…" | Use when creating or restructuring a .NET solution |
+| `serialization` | "Choose the right serialization format…" | Use when choosing or implementing serialization in .NET |
+| `testcontainers-integration-tests` | "Write integration tests using TestContainers…" | Use when writing **or debugging** container-based integration tests |
+
+### Changed — maintenance-track triggers (create-scoped descriptions were the review's failure cause #3b)
+
+The scenario traces showed the pattern skills firing only on *creation*-shaped tasks while daily work is *maintenance*-shaped — a stale-price bug on a versioned table never loaded the temporal knowledge because "designing or changing a schema" doesn't match "this query returns wrong data". Broadened:
+
+- **`database-design-conventions`** — now also fires "when debugging query or data defects on versioned/temporal tables" (the as-of predicate and close-and-insert rules ARE the fix for most such bugs)
+- **`testcontainers-integration-tests`**, **`aspire-integration-testing`**, **`playwright-blazor-testing`** — "writing **or debugging**" (flaky-test diagnosis previously matched nothing)
+
+### Fixed — honest relabeling of `api-design`
+
+README sold it as "Minimal API extend-only design" — the skill is actually NuGet/binary/wire-contract compatibility discipline and contains zero Minimal API endpoint content (no MapGroup/TypedResults). README row and description now say exactly that, including the explicit negative trigger ("not about Minimal API endpoint design") so it stops false-firing on endpoint work. Real Minimal API endpoint coverage remains an open gap (tracked from the fair review).
+
+### Budget accounting (honest numbers)
+
+Always-loaded metadata after this release: **9,949 chars ≈ ~2,490 tokens across 50 entries** (49 loaded + caveman disabled). The rewrites saved ~240 chars net while 0.7.0 added nhibernate-patterns (+290). This remains above the ~2,000-token default 1%-budget on 200K-context models — the README's `skillListingBudgetFraction: 0.02` guidance stands, and the SessionStart hook (0.6.1) keeps the load-bearing triage/discipline rules out of the drop-risk pool entirely.
+
+### Changed
+
+- Both manifests bumped to `0.8.0` (synchronous as always).
+
 ## [0.7.0] — 2026-07-11
 
 ### Added — `nhibernate-patterns`: NH as a first-class runtime citizen

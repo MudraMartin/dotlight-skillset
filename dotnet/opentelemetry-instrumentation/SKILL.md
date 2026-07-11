@@ -1,6 +1,6 @@
 ---
 name: opentelemetry-instrumentation
-description: Implement OpenTelemetry instrumentation in .NET — tracing (Activities/Spans), metrics, naming conventions, error handling, performance, and API design.
+description: Use when adding or reviewing OpenTelemetry instrumentation in .NET — ActivitySource tracing, metrics, logs, semantic conventions, SDK setup, package decisions.
 ---
 
 # OpenTelemetry .NET Instrumentation

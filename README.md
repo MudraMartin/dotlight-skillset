@@ -126,7 +126,7 @@ Then drag-drop or use your client's plugin install flow.
 | `database-review` 🆕 | **Dotlight original** — quality gate for schema diffs: dialect-deviation rules (DBR1xx), test-shaped schema smells (DBR2xx), design basics incl. temporal mechanics (DBR3xx). Critical findings block merge |
 | `modern-csharp-coding-standards` | Records, pattern matching, nullable types |
 | `csharp-concurrency-patterns` | Task vs Channel vs lock |
-| `api-design` | Minimal API extend-only design, versioning |
+| `api-design` | Extend-only design for NuGet packages and versioned wire contracts (binary/wire compatibility, SemVer) — *not* Minimal API endpoint design |
 | `type-design-performance` | Sealed classes, readonly structs, Span<T> |
 | `dependency-injection-patterns` | IServiceCollection, scopes, keyed services |
 | `microsoft-extensions-configuration` | IOptions, secrets, env config |

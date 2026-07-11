@@ -1,6 +1,6 @@
 ---
 name: aspire-configuration
-description: Configure Aspire AppHost to emit explicit app config via environment variables; keep app code free of Aspire clients and service discovery.
+description: Use when wiring configuration between an Aspire AppHost and its services — AppHost emits explicit env vars; app code stays free of Aspire clients and service discovery.
 ---
 
 # Aspire Configuration

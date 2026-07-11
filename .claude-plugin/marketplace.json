@@ -9,8 +9,8 @@
     {
       "name": "dotlight-skillset",
       "source": "./",
-      "version": "0.7.0",
-      "description": "A lightweight curated Claude Code skillset for .NET developers — 0.7.0 makes NHibernate a first-class runtime citizen: new nhibernate-patterns skill (session-per-request, IStatelessSession, dirty-checking writes, fetch strategies, HQL bulk, Npgsql jsonb/enum, FluentMigrator/DbUp) + NH annotations across the EF-flavored skills. On 0.6.x: SessionStart hook (deterministic triage + skill discipline), wired review chain, upstream sync, lazy-senior-dev, database-design-conventions + database-review.",
+      "version": "0.8.0",
+      "description": "A lightweight curated Claude Code skillset for .NET developers — 0.8.0 rewrites all 18 remaining passive .NET pattern descriptions trigger-first ('Use when…') so the pattern layer actually auto-fires, adds maintenance/debug triggers (versioned-table defects, flaky tests), and honestly relabels api-design (NuGet/wire compat, not Minimal API). On 0.7.0: nhibernate-patterns (NH as first-class runtime). On 0.6.x: SessionStart hook, wired review chain, upstream sync, lazy-senior-dev, database-design-conventions + database-review.",
       "author": {
         "name": "Martin Mudra",
         "email": "martin.mudra@scalesoft.cz"

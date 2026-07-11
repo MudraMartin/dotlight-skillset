@@ -1,6 +1,6 @@
 ---
 name: aspire-service-defaults
-description: Create a shared ServiceDefaults project for Aspire applications. Centralizes OpenTelemetry, health checks, resilience, and service discovery configuration across all services.
+description: Use when setting up or changing an Aspire ServiceDefaults project — shared OpenTelemetry, health checks, resilience, and service discovery configuration across all services.
 ---
 
 # Aspire Service Defaults

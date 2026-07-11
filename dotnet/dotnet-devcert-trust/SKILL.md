@@ -1,6 +1,6 @@
 ---
 name: dotnet-devcert-trust
-description: Diagnose and fix .NET HTTPS dev certificate trust issues on Linux. Covers the full certificate lifecycle from generation to system CA bundle inclusion, with distro-specific guidance for Ubuntu, Fedora, Arch, and WSL2.
+description: Use when HTTPS dev-certificate trust fails on Linux or WSL2 — full certificate lifecycle from generation to system CA bundle, with distro-specific steps (Ubuntu, Fedora, Arch).
 ---
 
 # .NET Dev Certificate Trust on Linux

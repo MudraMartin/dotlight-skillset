@@ -1,6 +1,6 @@
 ---
 name: serialization
-description: Choose the right serialization format for .NET applications. Prefer schema-based formats (Protobuf, MessagePack) over reflection-based (Newtonsoft.Json). Use System.Text.Json with AOT source generators for JSON scenarios.
+description: Use when choosing or implementing serialization in .NET — schema-based formats (Protobuf, MessagePack) over reflection-based; System.Text.Json with AOT source generators for JSON.
 ---
 
 # Serialization in .NET
