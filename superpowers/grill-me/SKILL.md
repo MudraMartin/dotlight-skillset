@@ -1,6 +1,6 @@
 ---
 name: grill-me
-description: "Use when the user wants a plan, spec, or design stress-tested — say \"grill me\", \"poke holes\", \"interrogate this design\", or has a draft they're not confident in. Walks the decision tree branch-by-branch, one focused question at a time, with a recommended answer for each."
+description: "Use when the user says \"grill me\", \"poke holes\", or wants a plan, spec, or design stress-tested. Branch-by-branch interrogation, one question at a time, each with a recommended answer."
 ---
 
 # Grill Me
@@ -28,11 +28,12 @@ Use this when the input already exists:
 3. **Walk the tree top-down.** Resolve parents before children. Don't drill into "should this endpoint return 409 or 422" before you've settled "is this command idempotent."
 4. **Ask one question at a time.** Never bundle. Wait for the answer before composing the next question — answers reshape the remaining tree.
 5. **Always provide a recommended answer.** Phrase it: *"Recommended: X. Reason: Y."* The user pushes back, accepts, or refines. Never ask an open-ended "what do you think?" — that's brainstorming, not grilling.
-6. **Prefer the codebase to the user.** If a question is answerable by reading code, configuration, migrations, recent commits, or referenced docs, **read first, ask only if still ambiguous.** "Does this aggregate already exist?" is a `Grep` away.
+6. **Prefer the codebase to the user.** If a *fact* can be found by exploring the codebase — code, configuration, migrations, recent commits, referenced docs — look it up rather than asking. "Does this aggregate already exist?" is a `Grep` away. The *decisions*, though, are the user's — put each one to them and wait for the answer.
 7. **Use `AskUserQuestion` for choice-shaped questions** (2–4 distinct options). Free-text only when the answer space is genuinely open (a name, a number, a free-form rationale). The first option in `AskUserQuestion` is your recommendation, labeled "(Recommended)".
-   - **Deferred-tool note**: In Claude Code 2.x+, `AskUserQuestion` may appear in a `<system-reminder>` listing deferred tools. If so, call `ToolSearch` with `"select:AskUserQuestion"` once at session start to load its schema — otherwise calls fail with `InputValidationError` and the skill silently degrades to text "1, 2, 3" lists.
+   - Preload AskUserQuestion via ToolSearch "select:AskUserQuestion" once per session (deferred tool — rationale in `using-superpowers`); fall back to numbered text lists only if unavailable.
 8. **Push back on hand-waving.** "We'll figure it out later" and "it should be fine" are not answers — they are unresolved branches. Mark them and return.
 9. **Stop when the tree is resolved**, not when the user gets tired. If the user wants to stop early, summarize the *unresolved* branches as risks before exiting.
+10. **Do not enact the plan until the user confirms you have reached a shared understanding.** A resolved tree is not a go-ahead — wait for explicit confirmation before any implementation.
 
 ## What to grill on — domain-first checklist
 

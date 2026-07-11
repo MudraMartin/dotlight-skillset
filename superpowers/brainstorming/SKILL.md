@@ -13,31 +13,30 @@ Start by understanding the current project context, then ask questions one at a 
 Do NOT invoke any implementation skill, write any code, scaffold any project, or take any implementation action until you have presented a design and the user has approved it. This applies to EVERY project regardless of perceived simplicity.
 </HARD-GATE>
 
+**Triage first:** Brainstorming is for designs. Bugfixes, config tweaks, and one-file changes skip this skill entirely — the using-superpowers triage rule routes them straight to execution. If the user brings a trivial task here anyway, a two-sentence design is acceptable.
+
 ## Anti-Pattern: "This Is Too Simple To Need A Design"
 
-Every project goes through this process. A todo list, a single-function utility, a config change — all of them. "Simple" projects are where unexamined assumptions cause the most wasted work. The design can be short (a few sentences for truly simple projects), but you MUST present it and get approval.
+Every project that reaches brainstorming goes through this process. A todo list, a single-function utility, a small feature — all of them. "Simple" projects are where unexamined assumptions cause the most wasted work. The design can be short (a few sentences for truly simple projects), but you MUST present it and get approval. Tasks below the design threshold — bugfixes, config tweaks, one-file changes — belong to triage, not here.
 
 ## Checklist
 
 You MUST create a task for each of these items and complete them in order:
 
 1. **Explore project context** — check files, docs, recent commits
-2. **Offer visual companion** (if topic will involve visual questions) — this is its own message, not combined with a clarifying question. See the Visual Companion section below.
-3. **Ask clarifying questions** — one at a time, understand purpose/constraints/success criteria
-4. **Propose 2-3 approaches** — with trade-offs and your recommendation
-5. **Present design** — in sections scaled to their complexity, get user approval after each section
-6. **Write design doc** — save to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md` and commit
-7. **Spec self-review** — quick inline check for placeholders, contradictions, ambiguity, scope (see below)
-8. **User reviews written spec** — ask user to review the spec file before proceeding
-9. **Transition to implementation** — invoke writing-plans skill to create implementation plan
+2. **Ask clarifying questions** — one at a time, understand purpose/constraints/success criteria
+3. **Propose 2-3 approaches** — minimal version first, with trade-offs and your recommendation
+4. **Present design** — in sections scaled to their complexity, get user approval after each section
+5. **Write design doc** — save to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md` and commit
+6. **Spec self-review** — quick inline check for placeholders, contradictions, ambiguity, scope (see below)
+7. **User reviews written spec** — ask user to review the spec file before proceeding
+8. **Transition to implementation** — invoke writing-plans skill to create implementation plan
 
 ## Process Flow
 
 ```dot
 digraph brainstorming {
     "Explore project context" [shape=box];
-    "Visual questions ahead?" [shape=diamond];
-    "Offer Visual Companion\n(own message, no other content)" [shape=box];
     "Ask clarifying questions" [shape=box];
     "Propose 2-3 approaches" [shape=box];
     "Present design sections" [shape=box];
@@ -47,10 +46,7 @@ digraph brainstorming {
     "User reviews spec?" [shape=diamond];
     "Invoke writing-plans skill" [shape=doublecircle];
 
-    "Explore project context" -> "Visual questions ahead?";
-    "Visual questions ahead?" -> "Offer Visual Companion\n(own message, no other content)" [label="yes"];
-    "Visual questions ahead?" -> "Ask clarifying questions" [label="no"];
-    "Offer Visual Companion\n(own message, no other content)" -> "Ask clarifying questions";
+    "Explore project context" -> "Ask clarifying questions";
     "Ask clarifying questions" -> "Propose 2-3 approaches";
     "Propose 2-3 approaches" -> "Present design sections";
     "Present design sections" -> "User approves design?";
@@ -74,7 +70,7 @@ digraph brainstorming {
 - If the project is too large for a single spec, help the user decompose into sub-projects: what are the independent pieces, how do they relate, what order should they be built? Then brainstorm the first sub-project through the normal design flow. Each sub-project gets its own spec → plan → implementation cycle.
 - For appropriately-scoped projects, ask questions one at a time to refine the idea
 - **ALWAYS prefer the `AskUserQuestion` tool over text-based multiple choice.** This project runs in clients (Claude Code desktop, Cowork) that render `AskUserQuestion` as clickable choice cards. Text-based "Option A / B / C" lists are a last resort for open-ended questions only.
-  - **Tool-loading prerequisite** (Claude Code 2.x+): `AskUserQuestion` is a *deferred* tool — it appears by name in a `<system-reminder>` listing deferred tools, but its parameter schema is NOT loaded by default, so calling it directly fails with `InputValidationError` and the model silently falls back to text "1, 2, 3" lists. **Before your first multi-choice question**, call `ToolSearch` with `"select:AskUserQuestion"` once per session to load its schema. If `AskUserQuestion` is *not* in the deferred list (older Claude Code, or already loaded), this step is a no-op — proceed normally.
+  - Preload AskUserQuestion via ToolSearch "select:AskUserQuestion" once per session (deferred tool); fall back to numbered text lists only if unavailable.
   - 2-4 mutually exclusive choices → `AskUserQuestion` with options, first option is the recommended default labeled with "(Recommended)" and a short rationale
   - Yes/No confirmations → `AskUserQuestion` with two options, never a free-text question
   - Truly open-ended ("describe the use case in your own words", "what problem are you trying to solve?") → plain text question is fine
@@ -86,6 +82,7 @@ digraph brainstorming {
 **Exploring approaches:**
 
 - Propose 2-3 different approaches with trade-offs
+- One of the approaches MUST always be the minimal version — the smallest design that satisfies the stated requirements, nothing speculative. Present it first, and recommend it by default unless the user's constraints justify more.
 - Present options conversationally with your recommendation and reasoning
 - Lead with your recommended option and explain why
 
@@ -98,7 +95,7 @@ digraph brainstorming {
   1. **Domain model FIRST** — aggregates, entities with their relationships (name + cardinality of every FK / navigation), invariants ("what must always hold true across entities"), value objects. For .NET projects follow `type-design-performance` and `api-design`. **Never skip this section, even for "simple" features.** A feature that looks trivial but touches a badly-modeled aggregate is the #1 source of rework.
   2. Architecture — which layers/projects are touched
   3. Components — concrete classes/modules and their public surface
-  4. Data flow — request → processing → persistence → response
+  4. Data flow — request → processing → persistence → response. When persistence is touched, name the lifecycle pattern per table (versioning / history / soft delete / plain) and check it matches the existing schema's convention — consult `database-design-conventions`
   5. Error handling — failure modes, transactional boundaries
   6. Testing strategy — what's unit-tested, what's integration-tested, what's E2E
 - Be ready to go back and clarify if something doesn't make sense
@@ -153,10 +150,7 @@ Wait for the user's response. If they request changes, make them and re-run the 
 - **AskUserQuestion preferred** - Use the tool for any 2-4 choice question; text lists are a fallback
 - **Budget questions** - Max 5 for small scope, max 8 for larger features; then summarize and ask user to fill gaps
 - **YAGNI ruthlessly** - Remove unnecessary features from all designs
+- **Reviewability is a design constraint** - A senior developer must be able to review the result. Prefer the design that produces the smallest diff.
 - **Explore alternatives** - Always propose 2-3 approaches before settling
 - **Incremental validation** - Present design, get approval before moving on
 - **Be flexible** - Go back and clarify when something doesn't make sense
-
-## Visual Companion
-
-A browser-based companion f

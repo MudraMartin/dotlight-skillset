@@ -1,6 +1,6 @@
 ---
 name: aspire-mcp-first
-description: When the Aspire CLI MCP server is attached (mcp__aspire__* tools available) AND a .NET Aspire AppHost is running, query Aspire's MCP server for resource state, console logs, distributed traces, and resource commands BEFORE shelling out to docker logs, parsing log files, or guessing at endpoints. Situational — invoke when debugging a running Aspire app or when the user mentions log/health/trace investigation.
+description: Use when mcp__aspire__* tools are attached AND an Aspire AppHost is running — query resource state, console logs, traces, and endpoints via Aspire MCP before docker logs, log-file parsing, or port guessing.
 ---
 
 # Aspire MCP First

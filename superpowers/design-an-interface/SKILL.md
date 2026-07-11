@@ -1,6 +1,6 @@
 ---
 name: design-an-interface
-description: "Use before committing to the public surface of a module, library, Minimal API endpoint group, or aggregate root — especially when the first design \"feels obvious\" or when the type is hard to change later. Generates 3+ radically different designs in parallel, then compares them on simplicity, depth, and ease of correct use."
+description: "Use before committing to a hard-to-change public surface — library API, Minimal API endpoint group, aggregate root. Generates 3+ radically different designs in parallel and compares on simplicity, depth, ease of correct use."
 ---
 
 # Design an Interface
@@ -34,7 +34,7 @@ Before designing, pin down:
 - **Constraints.** Performance budget, AOT-compat, allocation budget, existing convention in the codebase, persistence shape, wire compat for already-shipped consumers.
 - **What stays inside.** What complexity must this surface *hide*? (Hidden complexity = depth = good.)
 
-Use `AskUserQuestion` for choice-shaped requirement decisions (e.g., "Is this exposed over HTTP, in-process, or both?"). For genuinely open requirements, free text.
+Use `AskUserQuestion` for choice-shaped requirement decisions (e.g., "Is this exposed over HTTP, in-process, or both?"). For genuinely open requirements, free text. Preload AskUserQuestion via ToolSearch "select:AskUserQuestion" once per session (deferred tool); fall back to numbered text lists only if unavailable.
 
 ### 2. Generate designs in parallel
 
@@ -68,6 +68,8 @@ Return:
 
 Do NOT implement. Do NOT discuss alternatives. Commit to this one shape.
 ```
+
+Include both the architecture vocabulary and the project's glossary vocabulary (`CONTEXT.md` / equivalent, if present) in each agent's brief, so the designs name things consistently with the project's domain language.
 
 Keep agent context isolated — they should not see each other's designs. Divergence comes from the constraint, not from negotiation.
 

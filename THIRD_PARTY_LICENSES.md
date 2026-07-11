@@ -1,6 +1,6 @@
 # Third-Party Licenses
 
-DotLightSkillset is built from **modified forks** of four upstream libraries. All are MIT-licensed and any redistribution (private or public) **must keep this file with the plugin**. This is what the MIT License requires — the copyright notice and license text must be preserved in distributions.
+DotLightSkillset is built from **modified forks** of five upstream libraries. All are MIT-licensed and any redistribution (private or public) **must keep this file with the plugin**. This is what the MIT License requires — the copyright notice and license text must be preserved in distributions.
 
 ---
 
@@ -148,6 +148,41 @@ SOFTWARE.
 
 ---
 
+## 5. DietrichGebert/ponytail
+
+One skill originates as an adaptation from this library:
+
+- `superpowers/lazy-senior-dev/` — adapted from `skills/ponytail`. Modifications: reconciled with dotlight's design-first workflow (the ladder governs implementation of the agreed design, never the design itself; approved plans are rung-1-exempt), .NET-flavored ladder rungs (BCL, `IOptions`, DB constraints, Rider MCP lookup), `ponytail:` comment convention renamed to `// lazy:`, intensity-level/hook machinery and hardware-calibration content dropped, Red Flags table added in dotlight house style, cross-references to `improve-architecture` / `test-driven-development` / `caveman` / quality gates.
+
+**Repository:** https://github.com/DietrichGebert/ponytail
+**Upstream license file:** https://github.com/DietrichGebert/ponytail/blob/main/LICENSE
+
+```
+MIT License
+
+Copyright (c) 2026 DietrichGebert
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+---
+
 ## Redistribution summary
 
 The MIT License imposes only two obligations:
@@ -165,5 +200,5 @@ The MIT License imposes only two obligations:
 **What would not be OK:**
 
 - ❌ Removing this `THIRD_PARTY_LICENSES.md` file when redistributing.
-- ❌ Removing the Jesse Vincent / Aaron Stannard / Matt Pocock / Jan Smejkal attributions.
+- ❌ Removing the Jesse Vincent / Aaron Stannard / Matt Pocock / Jan Smejkal / Dietrich Gebert attributions.
 - ❌ Claiming authorship of the whole library rather than of the modifications.

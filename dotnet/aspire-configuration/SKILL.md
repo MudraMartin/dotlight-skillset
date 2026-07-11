@@ -1,7 +1,6 @@
 ---
 name: aspire-configuration
 description: Configure Aspire AppHost to emit explicit app config via environment variables; keep app code free of Aspire clients and service discovery.
-invocable: false
 ---
 
 # Aspire Configuration

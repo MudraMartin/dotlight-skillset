@@ -24,6 +24,20 @@ Write the test first. Watch it fail. Write minimal code to pass.
 
 This is the #1 TDD failure mode for LLM-driven coding: tests pass because the agent generated trivial entities with no relationships. That is not TDD, that is test-cheating. If you catch yourself doing this, stop and re-read the domain model section of the plan.
 
+Its sibling failure mode: **tautological tests** — the assertion recomputes the expected value the same way the code does (`expect(add(a, b)).toBe(a + b)`, a constant asserted equal to itself), so the test passes by construction and can never disagree with the code. Expected values must come from an independent source of truth — a known-good literal, a worked example, the spec.
+
+## Prerequisite: Persistence Model Gates Schema Changes
+
+The moment any step would add or change a **migration, table, persisted entity, or mapping** (EF Core configuration, NHibernate mapping), check the plan's `## Persistence Model` section for that table. Section missing, or the table isn't in it → **STOP**, loop back to `writing-plans`. Do not "just add the column" — that is how schemas get tailor-made for tests instead of designed.
+
+When the section exists, GREEN-phase schema code transcribes it: same names, types, nullability, constraints, and lifecycle pattern. A test never justifies a schema deviation. If the designed schema can't satisfy the test, either the test is wrong (rewrite it) or the design needs revision (a `writing-plans` decision with your human partner) — never silent schema drift.
+
+## Prerequisite: Pre-Agreed Seams
+
+A **seam** is the public boundary you test at — the interface where you observe behavior without reaching inside. Tests live at seams, never against internals.
+
+**Before writing any test**, write down the seams under test and confirm them with your human partner. No test gets written at an unconfirmed seam. You can't test everything — agreeing seams up front puts testing effort on critical paths and complex logic, and caps test volume at what a human can review.
+
 ## When to Use
 
 **Always:**
@@ -174,7 +188,7 @@ async function retryOperation<T>(
 Over-engineered
 </Bad>
 
-Don't add features, refactor other code, or "improve" beyond the test.
+Don't add features, refactor other code, or "improve" beyond the test. Red comes before green, always — don't anticipate future tests or add speculative features.
 
 ### Verify GREEN - Watch It Pass
 
@@ -279,10 +293,13 @@ Tests-first force edge case discovery before implementing. Tests-after verify yo
 | "TDD will slow me down" | TDD faster than debugging. Pragmatic = test-first. |
 | "Manual test faster" | Manual doesn't prove edge cases. You'll re-test every change. |
 | "Existing code has no tests" | You're improving it. Add tests for existing code. |
+| "It's just one nullable column" | Test-shaped schemas accrete one "just one column" at a time. Design it in the plan first. |
 
 ## Red Flags - STOP and Start Over
 
 - Code before test
+- Migration or persisted column not present in the plan's `## Persistence Model`
+- Adding a column because a test asserts it
 - Test after implementation
 - Test passes immediately
 - Can't explain why test failed
@@ -345,4 +362,38 @@ Before marking work complete:
 - [ ] Wrote minimal code to pass each test
 - [ ] All tests pass
 - [ ] Output pristine (no errors, warnings)
-- [ ] Tests use real 
+- [ ] Tests use real code (mocks only if unavoidable)
+- [ ] Edge cases and errors covered
+
+Can't check all boxes? You skipped TDD. Start over.
+
+## When Stuck
+
+| Problem | Solution |
+|---------|----------|
+| Don't know how to test | Write wished-for API. Write assertion first. Ask your human partner. |
+| Test too complicated | Design too complicated. Simplify interface. |
+| Must mock everything | Code too coupled. Use dependency injection. |
+| Test setup huge | Extract helpers. Still complex? Simplify design. |
+
+## Debugging Integration
+
+Bug found? Write failing test reproducing it. Follow TDD cycle. Test proves fix and prevents regression.
+
+Never fix bugs without a test.
+
+## Testing Anti-Patterns
+
+When adding mocks or test utilities, read [testing-anti-patterns.md](testing-anti-patterns.md) to avoid common pitfalls:
+- Testing mock behavior instead of real behavior
+- Adding test-only methods to production classes
+- Mocking without understanding dependencies
+
+## Final Rule
+
+```
+Production code → test exists and failed first
+Otherwise → not TDD
+```
+
+No exceptions without your human partner's permission.

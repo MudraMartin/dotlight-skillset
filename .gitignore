@@ -11,8 +11,8 @@
 
 # -----------------------------------------------------------------------------
 # Node.js
-# Some skills (brainstorming/scripts/server.cjs, writing-skills/render-graphs.js)
-# use Node. If anyone runs `npm install` or adds dependencies, these keep it clean.
+# Some skills (writing-skills/render-graphs.js) use Node. If anyone runs
+# `npm install` or adds dependencies, these keep it clean.
 # -----------------------------------------------------------------------------
 node_modules/
 npm-debug.log*

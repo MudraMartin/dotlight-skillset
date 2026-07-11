@@ -1,7 +1,7 @@
 {
   "name": "dotlight-skillset",
-  "version": "0.5.3",
-  "description": "A lightweight curated Claude Code skillset for .NET developers. Combines a customized fork of obra/superpowers (workflow), a trimmed fork of Aaronontheweb/dotnet-skills (patterns + agents), and adapted skills from mattpocock/skills (grill-me, design-an-interface). Tuned for .NET 10 + Aspire + Minimal API + NHibernate or EF Core projects with Vue or Blazor frontends. Key overrides: AskUserQuestion-first brainstorming (with deferred-tool preload), domain-first planning before TDD, and executing-plans preferred over subagent-driven-development.",
+  "version": "0.6.0",
+  "description": "A lightweight curated Claude Code skillset for .NET developers. Combines a customized fork of obra/superpowers v6 (workflow), a trimmed fork of Aaronontheweb/dotnet-skills (patterns + agents), and adapted skills from mattpocock/skills, hsmejky/skills, and DietrichGebert/ponytail. Tuned for .NET 10 + Aspire + Minimal API + NHibernate or EF Core + Postgres/TimescaleDB projects with Vue or Blazor frontends. Key overrides: AskUserQuestion-first brainstorming, domain-first AND persistence-first planning before TDD, lazy-senior-dev minimalism (reviewability as a constraint), database-design-conventions + database-review quality gate, and executing-plans preferred over subagent-driven-development.",
   "author": {
     "name": "Martin Mudra",
     "email": "martin.mudra@scalesoft.cz"
@@ -18,6 +18,9 @@
     "tdd",
     "grill-me",
     "design-an-interface",
+    "lazy-senior-dev",
+    "database-design",
+    "temporal-versioning",
     "dispatching-parallel-agents",
     "brainstorming",
     "code-review",
@@ -35,6 +38,7 @@
     "./superpowers/grill-me",
     "./superpowers/grill-with-docs",
     "./superpowers/improve-architecture",
+    "./superpowers/lazy-senior-dev",
     "./superpowers/receiving-code-review",
     "./superpowers/requesting-code-review",
     "./superpowers/systematic-debugging",
@@ -53,7 +57,9 @@
     "./dotnet/csharp-coding-standards",
     "./dotnet/csharp-concurrency-patterns",
     "./dotnet/csharp-type-design-performance",
+    "./dotnet/database-design-conventions",
     "./dotnet/database-performance",
+    "./dotnet/database-review",
     "./dotnet/dotnet-devcert-trust",
     "./dotnet/efcore-patterns",
     "./dotnet/ilspy-decompile",

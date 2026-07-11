@@ -4,6 +4,67 @@ All notable changes to DotLightSkillset will be documented in this file.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] — 2026-07-11
+
+The largest release since 0.1.0: full upstream sync, a repaired foundation defect, an anti-overengineering layer, a designed-persistence layer, and an input-token diet. A 5th upstream attribution (DietrichGebert/ponytail) joins `THIRD_PARTY_LICENSES.md`.
+
+### Fixed — three core skills shipped TRUNCATED since v0.1.0
+
+`superpowers/brainstorming/SKILL.md`, `superpowers/writing-plans/SKILL.md`, and `superpowers/test-driven-development/SKILL.md` were cut mid-sentence in the initial fork commit and every release 0.1.0–0.5.3 shipped them broken — brainstorming lost its Visual Companion guidance, writing-plans lost the entire Self-Review checklist and Execution Handoff (the section the README claimed we modified), TDD lost When Stuck / Debugging Integration / the testing-anti-patterns link (orphaning that file) / the Final Rule. All three are rebuilt complete on the upstream v6.1.1 base with dotlight modifications re-applied. New guard: `scripts/check-md-integrity.js` (trailing newline + frontmatter closure + minimum size on every bundled .md) — run before every release.
+
+### Changed — superpowers re-forked onto v6.1.1 (was v5.0.7)
+
+- **`requesting-code-review`** — dotlight shipped a dispatch to a `superpowers:code-reviewer` agent that was never bundled (silent failure). Adopted upstream's self-contained general-purpose-subagent version + read-only-review rules + calibration section.
+- **`writing-plans`** — gains upstream's Task Right-Sizing (caps per-task diff at what a reviewer can gate), Global Constraints block, and per-task Interfaces block.
+- **`using-git-worktrees` / `finishing-a-development-branch`** — v6 rewrites: native EnterWorktree preference, consent before creating, merge-verified-before-cleanup, provenance-based cleanup, forge-neutral push.
+- **`using-superpowers`** — 43%-compressed v6.1.1 body; now hosts the AskUserQuestion-preload rationale once (other skills carry a one-line pointer); per-harness reference files (codex/copilot/gemini) deleted.
+- **`systematic-debugging`** — upstream fix for the literal "Ultrathink" keyword that silently forced extended thinking on every load (live token/latency leak in 0.1.0–0.5.3).
+- **`writing-skills`** — v6.1.1 "Match the Form to the Failure" + "Micro-Test Wording" + new description-budget subsection.
+- **`dispatching-parallel-agents`** — cheapest-adequate-model dispatch rule (harvested from upstream SDD's lesson).
+- **`executing-plans`** — no longer recommends the excluded subagent-driven-development over itself (!); checkpoint diff-stat reporting against the plan.
+- **`receiving-code-review`, `verification-before-completion`** — minor upstream syncs.
+- **Removed: brainstorming visual companion** (scripts/, visual-companion.md) — broken in dotlight since fork (the truncation cut its section), shipped upstream's pre-auth server with a known security hole, token-heavy and Windows-fragile. Orphaned `spec-document-reviewer-prompt.md` / `plan-document-reviewer-prompt.md` also removed (upstream replaced subagent review loops with inline self-review in v5.0.6).
+
+### Changed — dotnet-skills synced to v1.4.1
+
+`opentelemetry-instrumentation` adopted the v1.4.1 rewrite (fixes fabricated APIs, compile errors, wrong span hierarchy present in our v1.3.2 copy) + its 3 progressive-disclosure reference files. The other 25 bundled skills and all 3 agents are byte-identical between tags — nothing else to sync. New upstream skill `r3-reactive-extensions` deliberately excluded.
+
+### Added — anti-overengineering layer (goal: code reviewable by senior humans)
+
+- **`superpowers/lazy-senior-dev`** — adapted from [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail) (MIT): the 7-rung ladder (does it need to exist → reuse → BCL → platform feature → installed dep → one line → minimum code), root-cause-over-symptom bug fixes, `// lazy:` debt comments with named ceiling + upgrade path, safety carve-outs (never simplify validation at trust boundaries, data-loss handling, security). Reconciled with the design-first flow: **the ladder governs implementation of the agreed design, never the design itself** — approved plans are rung-1-exempt.
+- **`brainstorming`** — one of the 2-3 proposed approaches MUST be the minimal version, presented first, recommended by default; "Reviewability is a design constraint" key principle; triage escape-hatch (small tasks skip brainstorming entirely, per the new using-superpowers triage rule).
+- **`writing-plans` Minimalism Gate** — mandatory `## Non-Goals / Deliberately Not Built`; every file names its forcing requirement (deletion test via improve-architecture's shallow-module catalog); Self-Review reverse coverage (task with no requirement is deleted); No-Placeholders relaxed for repeated patterns ("as in Task N's block") to keep plans human-reviewable; per-batch review gates + Final review (hsmejky v0.2.0).
+- **`requesting-code-review`/code-reviewer.md Reviewability section** — diff-stat with ~400-changed-lines-per-task budget flag, single-implementation-interface deletion test, unused-generality check, "Extra: unrequested features / over-engineering" as spec-compliance findings (implementer "YAGNI" rationales never downgrade findings); unforced scope creep is Important/Critical.
+- **README `CLAUDE.md` snippet** — Anthropic's official anti-overeagerness block verbatim, with the "minimize scope, never correctness" carve-out.
+- **TDD** — pre-agreed seams (caps test volume at human review capacity), no-speculation line, tautological-test anti-pattern (mattpocock back-ports).
+- **`improve-architecture`** — one-adapter/two-adapter rule, Strong/Worth-exploring/Speculative badges, Top-recommendation closer.
+- **`grill-me`/`grill-with-docs`** — enact stop-gate + facts-vs-decisions split (decisions are the user's) from upstream /grilling.
+
+### Added — designed persistence layer (goal: DB navržená, ne vyrostlá z testů)
+
+- **`dotnet/database-design-conventions`** (+ `temporal-versioning.md`, `normalization-check.md`) — the house dialect: lifecycle-pattern catalog with a decision test (plain mutable / soft delete / in-table temporal `active_from`/`active_to` with NULL = current / side history table / append-only fact); **one schema, one dialect** meta-rule (mechanisms may differ per need, but each concept has exactly ONE canonical spelling — no `ValidFrom`/`StartFrom` synonyms); 11 rules incl. the constraint trio (partial unique index + btree_gist exclusion + period check), two-keys FK strategy with anchor tables, soft-delete XOR versioning, 5-step normalization gate, hypertables-never-versioned, expand-contract migrations; EF Core query-filter pitfalls + NHibernate filter-def/auxiliary-object mappings. Defers generic Postgres/Timescale mechanics to the **pg-aiguide** companion plugin (new README recommendation).
+- **`dotnet/database-review`** — quality gate alongside slopwatch/crap-analysis for schema diffs: dialect fingerprinting + uniformity rules (DBR1xx), test-shaped schema smells (DBR2xx: test-only columns, nullable-everything, missing FKs, fixture mirrors, God-table accretion), design basics (DBR3xx: missing unique constraints, unindexed FKs, broken temporal mechanics, version-row FK pins). Critical findings block merge; closes the blind spot where crap-analysis excludes `**/Migrations/**`.
+- **Persistence-First Rule** in `writing-plans` — every plan MUST have `## Persistence Model` (sentinel `None — no schema changes` allowed); derived from the Domain Model BEFORE task steps.
+- **TDD persistence gate** — any migration/entity/mapping change not covered by the plan's Persistence Model → STOP, loop back; a test never justifies a schema deviation.
+
+### Changed — input-token diet (goal B)
+
+- Always-loaded metadata cut from ~10,996 to ~9,900 chars **despite adding 3 skills**: 13 worst descriptions rewritten trigger-first (improve-architecture 513→252, caveman 481→0, aspire-mcp-first 411→211, grill-with-docs 390→215, rider-mcp-first 379→281, agents −430, …).
+- **`caveman`** gains `disable-model-invocation: true` — zero context cost, explicit `/caveman` only (verified against current Claude Code docs; the `invocable:` field carried by dotnet skills is non-standard and ignored — removed everywhere).
+- **`rider-mcp-first`** body split: gates, decision table, and Red Flags stay in SKILL.md (~11K chars, was 19K); setup, projectPath examples, multi-project diagnosis, token math, and cooperation notes moved to `reference.md`. Saves ~2K tokens on every .NET session.
+- AskUserQuestion preload rationale deduplicated (5 copies → 1 in using-superpowers + one-line pointers).
+- README gains a Token-budget hygiene section (`/doctor`, `/context`, `skillListingBudgetFraction`, project-scoped `.mcp.json` for MCP schema costs).
+
+### Deferred (documented, not done)
+
+- Progressive-disclosure splits of the 7 largest upstream-derived dotnet skill bodies (efcore-patterns 17.8K … package-management 11.9K) — kept verbatim to preserve a clean upstream-sync surface; upstream is doing its own splits (v1.3.1 PR #48, v1.4.1 OTel).
+- Re-evaluating `subagent-driven-development` (v6.0.0 rewrite: ~2x faster, ~50% fewer tokens, per-task over-engineering verdicts) as an opt-in exec mode.
+- Micro-tested evals for the new skills per writing-skills v6 guidance.
+
+### Changed
+
+- `plugin.json` and `marketplace.json` both bumped to `0.6.0` (synchronous as always). Skill counts: workflow **19**, .NET patterns **28**, agents 3.
+
 ## [0.5.3] — 2026-05-08
 
 ### Fixed — `rider-mcp-first` drift recovery (closes two rationalization gaps)

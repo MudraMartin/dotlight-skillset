@@ -1,6 +1,6 @@
 ---
 name: grill-with-docs
-description: "Stress-test a plan, spec, or design against the project's existing documented language and decisions. Use when the user wants grilling AND the project has any combination of: glossary file (CONTEXT.md / project_conventions.md / docs/architecture.md), ADR log (docs/adr/*.md / Resources/Specifications/*Decisions*.md), domain model document. Updates docs inline as resolutions crystallise."
+description: "Use when the user wants a plan or design grilled AND the project has a glossary, ADR log, or domain-model doc. Same interrogation as grill-me plus glossary cross-check, code cross-reference, and inline doc updates."
 ---
 
 # Grill With Docs
@@ -19,11 +19,7 @@ Use this when **all three** are true:
 
 If the project has **no** documented language or decisions, use `grill-me` instead — it's lighter and doesn't try to write to non-existent files. If you find yourself co-authoring a design rather than pressure-testing one, you've drifted into `brainstorming` — exit and switch.
 
-## AskUserQuestion preload (Claude Code 2.x+)
-
-This skill asks a lot of multi-choice questions. `AskUserQuestion` may be a **deferred** tool — listed in a `<system-reminder>` block but with its parameter schema not loaded by default. If so, calling it directly fails with `InputValidationError` and the skill silently degrades to text "1, 2, 3" lists, which the user has to read instead of clicking.
-
-**Before your first multi-choice question, call `ToolSearch` with query `"select:AskUserQuestion"` once per session.** If `AskUserQuestion` is not in the deferred list (older Claude Code, or already loaded), this is a no-op — proceed normally.
+This skill asks a lot of multi-choice questions: preload AskUserQuestion via ToolSearch "select:AskUserQuestion" once per session (deferred tool — rationale in `using-superpowers`); fall back to numbered text lists only if unavailable.
 
 ## Document discovery
 
@@ -73,12 +69,13 @@ The flow mirrors `grill-me` with three additions: glossary cross-check, code cro
 5. **Ask one question at a time, always with a recommended answer.** *"Recommended: X. Reason: Y."* The user pushes back, accepts, or refines. Never ask open-ended "what do you think?" — that's brainstorming.
 6. **Glossary cross-check** — when the user uses a term, check it against the glossary. If conflict: **interrupt the current branch**, resolve terminology first. *"Your glossary defines 'cancellation' as X. You just used it to mean Y. Which is right? (Recommended: rename Y to 'reversal' to keep X for the existing meaning.)"*
 7. **Sharpen fuzzy language** — when the user uses overloaded terms (`account`, `user`, `order`), propose a precise canonical term. Add it to the glossary.
-8. **Cross-reference with code** — for any "the system does X" claim, check the code. If contradiction, surface it: *"You said partial cancellation is supported, but `OrderService.Cancel()` cancels the whole order — which is right?"* (Use `mcp__rider__search_symbol` / `find_references` if Rider MCP is attached — see `rider-mcp-first` skill.)
+8. **Cross-reference with code** — for any "the system does X" claim, check the code. If contradiction, surface it: *"You said partial cancellation is supported, but `OrderService.Cancel()` cancels the whole order — which is right?"* (Use `mcp__rider__search_symbol` / `find_references` if Rider MCP is attached — see `rider-mcp-first` skill.) If a *fact* can be found in the codebase or the docs, look it up rather than asking. The *decisions*, though, are the user's — put each one to them and wait for the answer.
 9. **Use `AskUserQuestion` for choice-shaped questions** — first option labeled "(Recommended)". Free text only when the answer space is genuinely open (a name, a number, a free-form rationale).
 10. **Push back on hand-waving** — "we'll figure it out later" / "it should be fine" are unresolved branches. Mark them and return.
 11. **Update the glossary inline** — when a term is resolved, write it to the glossary right there. **Don't batch.** Use the format in [CONTEXT-FORMAT.md](CONTEXT-FORMAT.md).
 12. **Offer ADRs sparingly** — only when **all three** are true: hard to reverse + surprising without context + result of a real trade-off. Use the format in [ADR-FORMAT.md](ADR-FORMAT.md). Match the existing numbering scheme. Don't open an ADR for routine choices.
 13. **Stop when the tree is resolved**, not when the user gets tired. If they want to stop early, summarize unresolved branches as risks before exiting.
+14. **Do not enact the plan until the user confirms you have reached a shared understanding.** A resolved tree is not a go-ahead — wait for explicit confirmation before any implementation.
 
 ## Domain-first checklist (.NET projects)
 

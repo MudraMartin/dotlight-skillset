@@ -9,8 +9,8 @@
     {
       "name": "dotlight-skillset",
       "source": "./",
-      "version": "0.5.3",
-      "description": "A lightweight curated Claude Code skillset for .NET developers — Aspire (4 skills incl. aspire-mcp-first), OpenTelemetry, ILSpy, Blazor Playwright, 3 specialized .NET agents, rider-mcp-first (0.5.3 closes drift-recovery gap: per-call gate now explicitly runs after drift, Red Flags table names the Read-real-quick variant and the path-dependence rationalization that turns one slipped call into a session-long fallback), grill-with-docs, improve-architecture, caveman.",
+      "version": "0.6.0",
+      "description": "A lightweight curated Claude Code skillset for .NET developers — 0.6.0 syncs all upstreams (superpowers v6.1.1, dotnet-skills v1.4.1), repairs three truncated core skills, adds lazy-senior-dev (anti-overengineering, adapted from ponytail), database-design-conventions (ActiveFrom/ActiveTo temporal versioning, one-schema-one-dialect) + database-review quality gate, persistence-first planning, and a description-budget token diet.",
       "author": {
         "name": "Martin Mudra",
         "email": "martin.mudra@scalesoft.cz"

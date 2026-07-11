@@ -40,6 +40,7 @@ _Avoid_: Client, buyer, account
 
 ## Rules
 
+- **A glossary and nothing else.** The glossary/CONTEXT file stays totally devoid of implementation details. Don't treat it as a spec, a scratch pad, or a repository for implementation decisions.
 - **Be opinionated.** When multiple words exist for the same concept, pick the best one and list the others as aliases to avoid.
 - **Flag conflicts explicitly.** If a term is used ambiguously, call it out in "Flagged ambiguities" with a clear resolution.
 - **Keep definitions tight.** One sentence max. Define what it IS, not what it does.

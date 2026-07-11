@@ -4,33 +4,36 @@
 
 Plugin identifier: `dotlight-skillset`
 
-Combines three upstream MIT skill libraries into one opinionated bundle, with workflow overrides that fix the rough edges of "pure TDD" agent loops.
+Combines five upstream MIT skill libraries into one opinionated bundle, with workflow overrides that fix the rough edges of "pure TDD" agent loops — and, since 0.6.0, a minimalism layer that keeps generated code reviewable by humans and a designed (not test-accreted) persistence layer.
 
 ## What it bundles
 
-- **Workflow (18 skills)** — customized fork of [obra/superpowers](https://github.com/obra/superpowers) plus four adapted skills from [mattpocock/skills](https://github.com/mattpocock/skills) (`grill-me`, `design-an-interface`, `grill-with-docs`) and two from [hsmejky/skills](https://github.com/hsmejky/skills) (`improve-architecture`, `caveman`): brainstorming → writing-plans → executing-plans → TDD → code review → finishing-branch, plus worktrees, systematic-debugging, parallel agents, skill authoring, doc-aware grilling (`grill-with-docs`), Ousterhout-style architecture review (`improve-architecture`), and explicit-trigger ultra-terse mode (`caveman`).
-- **.NET patterns (26 skills)** — curated fork of [Aaronontheweb/dotnet-skills](https://github.com/Aaronontheweb/dotnet-skills): C# standards, Minimal API design, DI, configuration, serialization, Aspire (4 skills — configuration, service-defaults, integration-testing, **mcp-first** for runtime debugging), OpenTelemetry, Testcontainers, Playwright (Blazor + CI caching), ILSpy decompilation, quality gates (slopwatch + CRAP). Plus dotlight-original **`rider-mcp-first`** — when JetBrains Rider MCP is attached, force semantic operations over filesystem Grep/Read for **50–90 % token savings on .NET exploration**.
+- **Workflow (19 skills)** — customized fork of [obra/superpowers](https://github.com/obra/superpowers) **v6.1.1** plus adapted skills from [mattpocock/skills](https://github.com/mattpocock/skills) (`grill-me`, `design-an-interface`, `grill-with-docs`), [hsmejky/skills](https://github.com/hsmejky/skills) (`improve-architecture`, `caveman`), and [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail) (`lazy-senior-dev`): brainstorming → writing-plans → executing-plans → TDD → code review → finishing-branch, plus worktrees, systematic-debugging, parallel agents, skill authoring, doc-aware grilling, Ousterhout-style architecture review, explicit-trigger ultra-terse mode, and the **lazy-senior-dev** minimalism reflex (reuse before write, stdlib before dependency, the minimal version of the agreed design).
+- **.NET patterns (28 skills)** — curated fork of [Aaronontheweb/dotnet-skills](https://github.com/Aaronontheweb/dotnet-skills) **v1.4.1**: C# standards, Minimal API design, DI, configuration, serialization, Aspire (4 skills — configuration, service-defaults, integration-testing, **mcp-first** for runtime debugging), OpenTelemetry (v1.4.1 rewrite + 3 reference files), Testcontainers, Playwright (Blazor + CI caching), ILSpy decompilation, quality gates (slopwatch + CRAP + **database-review**). Plus dotlight originals: **`rider-mcp-first`** (Rider MCP semantic ops over filesystem Grep/Read — **50–90 % token savings on .NET exploration**), **`database-design-conventions`** (lifecycle-pattern catalog incl. ActiveFrom/ActiveTo temporal versioning, one-schema-one-dialect, normalization gate), and **`database-review`** (schema quality gate against test-shaped schemas and dialect drift).
 - **Specialized .NET agents (3)** — `dotnet-performance-analyst`, `dotnet-benchmark-designer`, `dotnet-concurrency-specialist`. Use the `Agent` tool with `subagent_type` matching the agent name.
 
 Superpowers drives the **process**, dotnet-skills supply the **patterns**, agents do **focused diagnostic work**.
 
 ## Why this exists
 
-Out-of-the-box Superpowers has two habits that hurt .NET projects:
+Out-of-the-box agent workflows have four habits that hurt .NET projects:
 
 1. **TDD-first domain discovery.** "Minimal code to pass" applied literally produces entities without relationships and invariants.
 2. **Text-based Socratic dialogue.** Multiple-choice questions as plain-text lists, even in clients that render `AskUserQuestion` as clickable choice cards.
+3. **Over-generation.** Agents produce enormous, speculative diffs that no senior developer can sustainably review — humans are lazy in the good way; agents are not.
+4. **Test-shaped schemas.** A DB layer accreted from TDD cycles is tailor-made for the tests, not designed for persistence.
 
 Fixed in modified `SKILL.md` files:
 
-- **`brainstorming`** — prefers `AskUserQuestion` over text multi-choice, caps questions at 5-8, enforces Domain Model as the first design section.
-- **`writing-plans`** — requires a `## Domain Model` section derived from the design. If missing, loops back to brainstorming. Default exec sub-skill is `executing-plans`, not `subagent-driven-development`.
-- **`test-driven-development`** — domain model must exist in the plan before first RED-GREEN-REFACTOR. Calls out "test-cheating" (satisfying tests by violating invariants) as the #1 LLM-TDD failure mode.
+- **`brainstorming`** — prefers `AskUserQuestion` over text multi-choice, caps questions at 5-8, enforces Domain Model as the first design section, and always proposes **the minimal version first** (reviewability is a design constraint).
+- **`writing-plans`** — requires a `## Domain Model` section AND a `## Persistence Model` section (may be `None — no schema changes`) derived from the design. If missing, loops back. **Minimalism Gate**: mandatory `## Non-Goals`, every file names its forcing requirement, reverse task-to-requirement coverage. Default exec sub-skill is `executing-plans`, not `subagent-driven-development`.
+- **`test-driven-development`** — domain model must exist before first RED-GREEN-REFACTOR; schema changes are gated on the plan's Persistence Model; tests go at pre-agreed seams. Calls out "test-cheating" (satisfying tests by violating invariants) and tautological tests as the top LLM-TDD failure modes.
+- **`lazy-senior-dev`** + **`requesting-code-review`** — the ladder (does it need to exist → reuse → stdlib → platform → one line → minimum code) governs implementation of the agreed design; review flags diffs over a human review budget, single-implementation interfaces, and unrequested features as spec-compliance findings.
 
 ## What's deliberately excluded
 
-- From Superpowers: `subagent-driven-development` (too slow; prefer `executing-plans`)
-- From dotnet-skills (skills): all `akka-*` (5), `aspire-mailpit-integration`, `mjml-email-templates`, `verify-email-snapshots`, `marketplace-publishing`, `skills-index-snippets`
+- From Superpowers: `subagent-driven-development` (the v6.0.0 rewrite is much improved — ~2x faster, per-task over-engineering verdicts — but `executing-plans` remains the dotlight exec mode; its best ingredients are ported into `requesting-code-review` and `dispatching-parallel-agents` instead). Also the brainstorming **visual companion** (browser server): token-heavy, Windows-fragile, and orthogonal to the .NET workflow — deleted in 0.6.0.
+- From dotnet-skills (skills): all `akka-*` (5), `aspire-mailpit-integration`, `mjml-email-templates`, `verify-email-snapshots`, `marketplace-publishing`, `skills-index-snippets`, `r3-reactive-extensions` (new in upstream v1.4.0)
 - From dotnet-skills (agents): `akka-net-specialist`, `docfx-specialist`, `roslyn-incremental-generator-specialist`
 
 For Akka.NET, Mailpit, or DocFX work, install the upstream `dotnet-skills` plugin alongside — they cooperate fine.
@@ -39,6 +42,7 @@ For Akka.NET, Mailpit, or DocFX work, install the upstream `dotnet-skills` plugi
 
 DotLightSkillset focuses on the .NET workflow surface. For adjacent specialties, pair it with:
 
+- **[timescale/pg-aiguide](https://github.com/timescale/pg-aiguide)** (`claude plugin marketplace add timescale/pg-aiguide`) — vendor-maintained Postgres + TimescaleDB skills (schema design, lock-safe migrations, hypertable mechanics) plus a docs-search MCP server. Dotlight's `database-design-conventions` is the **house-conventions layer on top**: it owns the temporal-versioning dialect, ORM mappings, and the one-schema-one-dialect rule, and defers generic Postgres/Timescale mechanics to pg-aiguide. Where styles differ (index naming, range-vs-two-column versioning), dotlight's conventions win.
 - **[VoltAgent — `voltagent-data-ai`](https://github.com/VoltAgent/awesome-claude-code-subagents)** — specialist agents for data-heavy .NET work: `postgres-pro`, `database-optimizer`, `data-engineer`, `ml-engineer`, `data-scientist`. Particularly useful with TimescaleDB / EF Core / NHibernate projects that grow ML-adjacent.
 - **`playwright@claude-plugins-official`** — general Playwright MCP integration for non-Blazor SPA stacks (Vue/Vite, React, etc.). Dotlight only ships the Blazor-specific Playwright skill.
 
@@ -87,35 +91,38 @@ Then drag-drop or use your client's plugin install flow.
 
 ## What's in the plugin
 
-### Workflow (18 skills)
+### Workflow (19 skills)
 
 | Skill | Role |
 |---|---|
-| `brainstorming` | Socratic design refinement — **uses `AskUserQuestion`** + enforces domain-first design |
-| `grill-me`† | Stress-test an existing plan/spec — branch-by-branch interrogation with recommended answers. Cross-references to `grill-with-docs` when project has docs. |
-| `grill-with-docs`† 🆕 | Doc-aware grilling — same Socratic discipline, plus glossary cross-check, code cross-reference, inline updates to glossary / ADRs. Path discovery for any project layout. |
-| `improve-architecture`‡ 🆕 | Ousterhout-style audit — find shallow modules, propose deepening opportunities. Disciplined vocabulary (Module / Interface / Depth / Seam / Adapter / Leverage / Locality), deletion test, parallel sub-agent design when needed. |
+| `brainstorming` | Socratic design refinement — **uses `AskUserQuestion`**, enforces domain-first design, always proposes the minimal version first |
+| `lazy-senior-dev`§ 🆕 | Minimalism reflex for any implementation work — the ladder (need → reuse → stdlib → platform → one line → minimum code), root-cause bug fixes, `// lazy:` debt comments, safety carve-outs. Governs implementation of the agreed design, never the design itself. |
+| `grill-me`† | Stress-test an existing plan/spec — branch-by-branch interrogation with recommended answers, enact stop-gate (decisions are the user's). |
+| `grill-with-docs`† | Doc-aware grilling — same Socratic discipline, plus glossary cross-check, code cross-reference, inline updates to glossary / ADRs. Path discovery for any project layout. |
+| `improve-architecture`‡ | Ousterhout-style audit — find shallow modules, propose deepening opportunities with Strong / Worth exploring / Speculative badges and a Top recommendation. One adapter = hypothetical seam; two = real. |
 | `design-an-interface`† | Generate 3–4 radically different designs in parallel, then compare on depth and ease of correct use. (Lighter standalone variant of `improve-architecture/INTERFACE-DESIGN.md`.) |
-| `writing-plans` | Bite-sized plan — **requires `## Domain Model`** or loops back |
-| `executing-plans` | Batch execution with human checkpoints (preferred exec mode) |
-| `test-driven-development` | RED-GREEN-REFACTOR with domain-model guard |
-| `requesting-code-review` | Pre-review checklist |
-| `receiving-code-review` | Responding to feedback |
+| `writing-plans` | Bite-sized plan — **requires `## Domain Model` + `## Persistence Model`** or loops back; Minimalism Gate (Non-Goals, forcing requirements, reverse coverage); Task Right-Sizing; Global Constraints; per-task Interfaces; per-batch review gates |
+| `executing-plans` | Batch execution with human checkpoints (preferred exec mode); checkpoint diff-stat reporting against the plan |
+| `test-driven-development` | RED-GREEN-REFACTOR with domain-model + persistence-model guards, pre-agreed seams, tautological-test warning |
+| `requesting-code-review` | Self-contained reviewer dispatch (v6.1.1) + Reviewability checks: diff budget, deletion test, unrequested features as spec findings |
+| `receiving-code-review` | Responding to feedback, incl. YAGNI check for "professional" features |
 | `systematic-debugging` | 4-phase root-cause process |
 | `verification-before-completion` | Make sure it's actually done |
-| `dispatching-parallel-agents` | Parallel subagents for independent tasks |
-| `using-git-worktrees` | Parallel development for larger features |
-| `finishing-a-development-branch` | Merge/PR/keep/discard decision flow |
-| `caveman`‡ 🆕 | Ultra-compressed response mode (~75% token savings, bullets-only, UTF substitutions). **Activates ONLY on explicit trigger** ("caveman mode" / "/caveman") — tightened from upstream to avoid accidental activation on phrases like "be brief". |
-| `writing-skills` | Author new skills |
-| `using-superpowers` | Intro to the system |
+| `dispatching-parallel-agents` | Parallel subagents for independent tasks + cheapest-adequate-model rule |
+| `using-git-worktrees` | Parallel development — prefers Claude Code's native EnterWorktree, consent before creating (v6.1.1) |
+| `finishing-a-development-branch` | Merge/PR/keep/discard decision flow, provenance line in PR bodies (v6.1.1) |
+| `caveman`‡ | Ultra-compressed response mode (~75% output-token savings). **`disable-model-invocation: true`** — zero always-loaded cost, explicit `/caveman` trigger only. Dotlight is now this skill's sole maintainer (both upstreams removed it). |
+| `writing-skills` | Author new skills — v6.1.1 "Match the Form to the Failure" + micro-test wording + description-budget guidance |
+| `using-superpowers` | Intro to the system (43% compressed in v6.1.1) + **triage rule**: small tasks take the direct track, no process bloat |
 
-† Adapted from [mattpocock/skills](https://github.com/mattpocock/skills); ‡ adapted from [hsmejky/skills](https://github.com/hsmejky/skills) (a fork of mattpocock — both attributions preserved); the rest are from [obra/superpowers](https://github.com/obra/superpowers).
+† Adapted from [mattpocock/skills](https://github.com/mattpocock/skills); ‡ adapted from [hsmejky/skills](https://github.com/hsmejky/skills) (a fork of mattpocock — both attributions preserved); § adapted from [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail); the rest are from [obra/superpowers](https://github.com/obra/superpowers) v6.1.1.
 
-### .NET patterns (26 skills)
+### .NET patterns (28 skills)
 
 | Skill | Role |
 |---|---|
+| `database-design-conventions` 🆕 | **Dotlight original** — the house DB dialect: lifecycle-pattern catalog (plain / soft-delete / ActiveFrom-ActiveTo temporal / side history table / append-only), one-schema-one-dialect meta-rule, FK strategy to versioned tables, normalization gate, naming, expand-contract migrations, EF Core + NHibernate mappings (+2 reference files) |
+| `database-review` 🆕 | **Dotlight original** — quality gate for schema diffs: dialect-deviation rules (DBR1xx), test-shaped schema smells (DBR2xx), design basics incl. temporal mechanics (DBR3xx). Critical findings block merge |
 | `modern-csharp-coding-standards` | Records, pattern matching, nullable types |
 | `csharp-concurrency-patterns` | Task vs Channel vs lock |
 | `api-design` | Minimal API extend-only design, versioning |
@@ -133,7 +140,7 @@ Then drag-drop or use your client's plugin install flow.
 | `aspire-service-defaults` | Shared OpenTelemetry / health checks / resilience / discovery setup |
 | `aspire-integration-testing` | `DistributedApplicationTestingBuilder` — primary lever for parallel integration tests |
 | `aspire-mcp-first` ⚡ | When `mcp__aspire__*` attached + AppHost running, force MCP for resource state / logs / traces over `docker logs` and port-guessing. Situational. |
-| `opentelemetry-instrumentation` | ActivitySource/Meter patterns, semantic conventions, zero-allocation paths |
+| `opentelemetry-instrumentation` | ActivitySource/Meter patterns, semantic conventions, package decision guide (v1.4.1 rewrite + 3 on-demand reference files) |
 | `testcontainers-integration-tests` | Docker-based integration tests (alternative to Aspire) |
 | `snapshot-testing` | Verify library, approval testing |
 | `playwright-ci-caching` | Browser caching in CI |
@@ -186,7 +193,7 @@ flowchart TD
     Approve -->|Revise| DomainFirst
     Approve -->|Yes| Spec[/"Save spec"/]
     Spec --> WP[writing-plans]
-    WP --> DMGate{"Plan has<br/>## Domain Model?"}
+    WP --> DMGate{"Plan has<br/>## Domain Model +<br/>## Persistence Model?"}
     DMGate -->|No, stop| BS
     DMGate -->|Thin / unsure| Grill
     DMGate -->|Yes| EP["executing-plans<br/>batch + checkpoints"]
@@ -195,7 +202,7 @@ flowchart TD
     TaskLoop -->|Yes| TDD
     TaskLoop -->|No| Checkpoint[Human checkpoint]
     Checkpoint --> RCR[requesting-code-review]
-    RCR --> QG["Quality gates:<br/>dotnet-slopwatch<br/>crap-analysis"]
+    RCR --> QG["Quality gates:<br/>dotnet-slopwatch<br/>crap-analysis<br/>database-review (schema diffs)"]
     QG --> Critical{"Critical findings?"}
     Critical -->|Yes| RRev[receiving-code-review]
     RRev --> EP
@@ -216,7 +223,7 @@ Two loop-backs do the real work: **`writing-plans` → `brainstorming`** when th
 
 ```mermaid
 flowchart TD
-    Start([Start TDD cycle]) --> Prereq{"Plan has<br/>## Domain Model?"}
+    Start([Start TDD cycle]) --> Prereq{"Plan has<br/>## Domain Model?<br/>Schema change → in<br/>## Persistence Model?"}
     Prereq -->|No| StopBack["STOP<br/>loop back to writing-plans"]
     Prereq -->|Yes| Red["RED<br/>test enforcing<br/>designed invariants"]
     Red --> RunFail[Run, verify fails]
@@ -249,6 +256,23 @@ Full workflow (brainstorming → plan → TDD → review) only for new features 
 3+ files or introducing a new aggregate, and for cross-layer refactors. For
 bugfixes, config tweaks, one-file changes: edit directly, run tests, short review.
 
+## Scope discipline
+
+Avoid over-engineering. Only make changes that are directly requested or clearly
+necessary. Keep solutions simple and focused:
+- Scope: Don't add features, refactor code, or make "improvements" beyond what
+  was asked. A bug fix doesn't need surrounding code cleaned up.
+- Documentation: Don't add docstrings, comments, or type annotations to code you
+  didn't change.
+- Defensive coding: Don't add error handling, fallbacks, or validation for
+  scenarios that can't happen. Trust internal code and framework guarantees.
+  Only validate at system boundaries (user input, external APIs).
+- Abstractions: Don't create helpers, utilities, or abstractions for one-time
+  operations. Don't design for hypothetical future requirements.
+The right amount of complexity is the minimum needed for the current task —
+but minimize scope, never correctness: input validation at trust boundaries,
+error handling that prevents data loss, and security are never simplified away.
+
 ## Exec mode
 
 Prefer `executing-plans` over `subagent-driven-development`. Use
@@ -257,7 +281,13 @@ Prefer `executing-plans` over `subagent-driven-development`. Use
 ## Quality gates
 
 When invoking `requesting-code-review`, also run `dotnet-slopwatch` and
-`crap-analysis`. Critical findings block merge.
+`crap-analysis`; when the diff touches migrations, entities, or mappings, also
+run `database-review`. Critical findings block merge.
+
+## Database
+
+Schema design follows `database-design-conventions`: one schema, one dialect.
+Rider MCP projectPath for this repo: <solution folder here>.
 
 ## Interaction
 
@@ -265,22 +295,35 @@ Prefer `AskUserQuestion` for 2-4 choice questions. First option is the
 recommended default labeled "(Recommended)".
 ```
 
-The plugin provides the skills — `CLAUDE.md` tells the agent when to use them.
+The plugin provides the skills — `CLAUDE.md` tells the agent when to use them. (The Scope-discipline block is Anthropic's official anti-overeagerness prompt with the community-learned correctness carve-out.)
+
+### Token-budget hygiene
+
+Claude Code caps always-loaded skill metadata at ~1 % of the context window and silently drops the least-used descriptions when over budget. With dotlight's 49 skills plus any other plugins, check `/doctor` (listing cost + biggest contributors) and `/context` (actual size, exclusion warnings). On 200K-context models, consider raising the budget in `settings.json`:
+
+```json
+{ "skillListingBudgetFraction": 0.02 }
+```
+
+Attached-but-unused MCP servers cost ~10–20K tokens/session each — register Rider/Aspire MCP project-scoped (`.mcp.json`), not user-scoped.
 
 ## License and attribution
 
 DotLightSkillset is MIT-licensed, © 2026 Martin Mudra. See [`LICENSE`](./LICENSE).
 
-Combines modified forks of three upstream MIT projects, with all licenses preserved verbatim in [`THIRD_PARTY_LICENSES.md`](./THIRD_PARTY_LICENSES.md):
+Combines modified forks of five upstream MIT projects, with all licenses preserved verbatim in [`THIRD_PARTY_LICENSES.md`](./THIRD_PARTY_LICENSES.md):
 
-- **[obra/superpowers](https://github.com/obra/superpowers)** — © 2025 Jesse Vincent / Prime Radiant
-- **[Aaronontheweb/dotnet-skills](https://github.com/Aaronontheweb/dotnet-skills)** — © 2025 Aaron Stannard
+- **[obra/superpowers](https://github.com/obra/superpowers)** — © 2025 Jesse Vincent / Prime Radiant (synced to v6.1.1)
+- **[Aaronontheweb/dotnet-skills](https://github.com/Aaronontheweb/dotnet-skills)** — © 2025 Aaron Stannard (synced to v1.4.1)
 - **[mattpocock/skills](https://github.com/mattpocock/skills)** — © 2026 Matt Pocock (`grill-me`, `design-an-interface`, `grill-with-docs`)
 - **[hsmejky/skills](https://github.com/hsmejky/skills)** — © 2026 Jan Smejkal (fork modifications) + © 2026 Matt Pocock (original work, preserved) (`improve-architecture`, `caveman`)
+- **[DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail)** — © 2026 Dietrich Gebert (`lazy-senior-dev`)
 
 When redistributing (fork, rebrand, package), all license files must remain.
 
 ## Contributing & status
+
+**v0.6.0 — upstream sync + minimalism layer + designed persistence.** All four skill upstreams synced (superpowers v5.0.7 → v6.1.1 re-fork with dotlight modifications preserved; dotnet-skills v1.4.1 OTel rewrite; mattpocock/hsmejky back-ports). Repairs a defect present since v0.1.0: `brainstorming`, `writing-plans`, and `test-driven-development` shipped truncated mid-sentence — now rebuilt complete on the v6.1.1 base, guarded by `scripts/check-md-integrity.js`. New: `lazy-senior-dev` (anti-overengineering ladder, adapted from ponytail), `database-design-conventions` (lifecycle-pattern catalog, ActiveFrom/ActiveTo temporal versioning with DB-enforced constraints, one-schema-one-dialect, EF Core + NHibernate mappings), `database-review` (schema quality gate against test-shaped schemas), Persistence-First planning rule, Minimalism Gate, reviewability checks in code review, and a description-budget token diet (~1.1K chars cut despite 3 new skills; `caveman` moved to `disable-model-invocation`). Visual companion removed (broken since fork + shipped an unauthenticated server). See `CHANGELOG.md`.
 
 **v0.5.0 — `grill-with-docs` + `improve-architecture` + `caveman`.** Three new workflow skills with `AskUserQuestion` clickable-card preload. `grill-with-docs` is the doc-aware sibling of `grill-me` — cross-checks user terminology against the project glossary (with path discovery for `CONTEXT.md` / `project_conventions.md` / `Resources/Specifications/V*_*.md`), cross-references claims with the code, writes resolutions back into the docs (inline glossary + ADR offers when justified). `improve-architecture` is an Ousterhout-style deep-modules audit with disciplined vocabulary and `.NET`-specific deepening patterns. `caveman` is an explicit-trigger ultra-compressed response mode (bullets only, ≤8 words/bullet, UTF substitutions). Trigger description tightened from upstream — only activates on explicit phrases like "caveman mode" / "/caveman", not on ambiguous shortcuts like "be brief". Added `hsmejky/skills` as 4th upstream attribution.
 

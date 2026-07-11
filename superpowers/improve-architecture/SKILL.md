@@ -1,6 +1,6 @@
 ---
 name: improve-architecture
-description: Find deepening opportunities in a codebase by reading the code itself. Surface shallow modules, propose refactors that turn shallow modules into deep ones (Ousterhout's "A Philosophy of Software Design" + Feathers' seams). Use when the user wants to improve architecture, clean up code, deepen modules, find shallow modules, audit architecture, do an architecture review, mentions "ball of mud", "messy code", "how can I improve this design", consolidate tightly-coupled modules, or make a codebase more testable.
+description: Use when the user wants to improve architecture, audit or review a design, find or deepen shallow modules, or mentions "ball of mud" or messy code. Ousterhout-style audit — surfaces shallow modules and proposes deepening refactors with strength badges.
 ---
 
 # Improve Architecture
@@ -28,11 +28,7 @@ Key principles (see [LANGUAGE.md](LANGUAGE.md) for the full list):
 - **The interface is the test surface.**
 - **One adapter = hypothetical seam. Two adapters = real seam.**
 
-## AskUserQuestion preload (Claude Code 2.x+)
-
-Step 3 (presenting candidates) and step 4 (grilling loop) ask multi-choice questions. `AskUserQuestion` may be a **deferred** tool — listed in a `<system-reminder>` block but with its parameter schema not loaded by default. If so, calling it directly fails with `InputValidationError` and the skill silently degrades to text "1, 2, 3" lists, defeating the clickable-card UX.
-
-**Before your first multi-choice question (typically the candidate list in step 3), call `ToolSearch` with query `"select:AskUserQuestion"` once per session.** No-op if already loaded or not deferred.
+Steps 3 and 4 ask multi-choice questions: preload AskUserQuestion via ToolSearch "select:AskUserQuestion" once per session (deferred tool — rationale in `using-superpowers`); fall back to numbered text lists only if unavailable.
 
 ## Process
 
@@ -71,6 +67,9 @@ Present a numbered list of deepening opportunities. For each candidate:
 - **Problem** — why the current architecture is causing friction
 - **Solution** — plain English description of what would change
 - **Benefits** — explained in terms of locality and leverage, and how tests would improve
+- **Recommendation strength** — label each candidate one of `Strong`, `Worth exploring`, `Speculative`
+
+End the list with a **Top recommendation** line: which candidate you'd tackle first and why.
 
 Use names from the code, plus [LANGUAGE.md](LANGUAGE.md) vocabulary for architecture (Module / Interface / Depth / Seam / etc.).
 
@@ -95,7 +94,7 @@ If alternative interfaces need parallel exploration, see [INTERFACE-DESIGN.md](I
 These are common shallow-module shapes in .NET projects worth flagging during exploration:
 
 - **`*Service` + `*Repository` + `*Mapper` triplets** that all live under a single domain concept and share most fields. Often deepenable into a single aggregate facade. Apply deletion test to the mapper first — it's usually pass-through.
-- **`I*Provider` interfaces with one implementation** — single-adapter "seam" that's just indirection. Either delete the interface (no real seam) or add a second adapter (test fake) and make the seam real.
+- **`I*Provider` interfaces with one implementation** — single-adapter "seam" that's just indirection. One adapter means a hypothetical seam. Two adapters means a real one. Don't introduce a seam unless something actually varies across it. Either delete the interface (no real seam) or add a second adapter (test fake) and make the seam real.
 - **Endpoint / Controller / Handler classes that delegate to a `*Service` that delegates to a `*Repository`** — three shallow layers, each adding a method signature for every operation. Often deepenable into one handler that owns the use case end-to-end.
 - **`AutoMapper` profiles for type pairs that are 90% structurally identical** — the mapper is shallower than just doing the projection inline. Deletion test: would inlining the projection complicate callers? Often no.
 - **Helper classes with one static method** — symptom of "extracted for testability" without locality. The bug is rarely in the helper; it's in how the caller composes things.
@@ -109,7 +108,7 @@ These are common shallow-module shapes in .NET projects worth flagging during ex
 - `design-an-interface` — lightweight standalone variant of the parallel sub-agent pattern. `improve-architecture/INTERFACE-DESIGN.md` is the same idea integrated into a full architectural review.
 - `grill-me` / `grill-with-docs` — Socratic stress-test of a plan or spec. `improve-architecture` does the same thing but **starts from the code**, not a draft.
 - `dotnet-performance-analyst` (agent) — when a deepening candidate is performance-driven (hot path, allocation hot spot), delegate the measurement to this agent before committing.
-- `csharp-type-design-performance` — informs the shape of deep modules in .NET (records vs classes, `readonly struct`, `Span<T>`).
+- `type-design-performance` — informs the shape of deep modules in .NET (records vs classes, `readonly struct`, `Span<T>`).
 - `rider-mcp-first` — for the exploration step in step 2, semantic ops via Rider MCP are dramatically faster than `Grep`.
 
 ## Anti-patterns
@@ -122,4 +121,4 @@ These are common shallow-module shapes in .NET projects worth flagging during ex
 
 ---
 
-*Adapted from [hsmejky/skills/improve-architecture](https://github.com/hsmejky/skills/tree/main/skills/improve-architecture) (MIT, © 2026 Jan Smejkal — fork modifications; © 2026 Matt Pocock — original work). Modifications: `AskUserQuestion` deferred-tool preload, `Explore` subagent fallback note, .NET-specific deepening patterns section, integration with `rider-mcp-first` for exploration, cross-references to dotlight's `brainstorming` / `design-an-interface` / `grill-me` / `grill-with-docs` / `dotnet-performance-analyst` / `csharp-type-design-performance`. Reference files (`LANGUAGE.md`, `DEEPENING.md`, `INTERFACE-DESIGN.md`) ported verbatim with light .NET annotations.*
+*Adapted from [hsmejky/skills/improve-architecture](https://github.com/hsmejky/skills/tree/main/skills/improve-architecture) (MIT, © 2026 Jan Smejkal — fork modifications; © 2026 Matt Pocock — original work). Modifications: `AskUserQuestion` deferred-tool preload, `Explore` subagent fallback note, .NET-specific deepening patterns section, integration with `rider-mcp-first` for exploration, cross-references to dotlight's `brainstorming` / `design-an-interface` / `grill-me` / `grill-with-docs` / `dotnet-performance-analyst` / `type-design-performance`. Reference files (`LANGUAGE.md`, `DEEPENING.md`, `INTERFACE-DESIGN.md`) ported verbatim with light .NET annotations.*

@@ -65,13 +65,16 @@ Each agent gets:
 
 ### 3. Dispatch in Parallel
 
-```typescript
-// In Claude Code / AI environment
-Task("Fix agent-tool-abort.test.ts failures")
-Task("Fix batch-completion-behavior.test.ts failures")
-Task("Fix tool-approval-race-conditions.test.ts failures")
-// All three run concurrently
+Issue all three subagent dispatches in the same response — they run in parallel:
+
+```text
+Subagent (general-purpose): "Fix agent-tool-abort.test.ts failures"
+Subagent (general-purpose): "Fix batch-completion-behavior.test.ts failures"
+Subagent (general-purpose): "Fix tool-approval-race-conditions.test.ts failures"
+# All three run concurrently.
 ```
+
+Multiple dispatch calls in one response = parallel execution. One per response = sequential.
 
 ### 4. Review and Integrate
 
@@ -108,6 +111,10 @@ Do NOT just increase timeouts - find the real issue.
 
 Return: Summary of what you found and what you fixed.
 ```
+
+## Model Selection for Dispatch
+
+Every dispatched subagent brief should state the cheapest model tier adequate for the task. An unnamed model silently inherits the session's most expensive one — one run put all 26 reviewers on the top tier.
 
 ## Common Mistakes
 
