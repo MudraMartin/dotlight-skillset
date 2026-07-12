@@ -13,7 +13,7 @@ Start by understanding the current project context, then ask questions one at a 
 Do NOT invoke any implementation skill, write any code, scaffold any project, or take any implementation action until you have presented a design and the user has approved it. This applies to EVERY project regardless of perceived simplicity.
 </HARD-GATE>
 
-**Triage first:** Brainstorming is for designs. Bugfixes, config tweaks, and one-file changes skip this skill entirely — the using-superpowers triage rule routes them straight to execution. If the user brings a trivial task here anyway, a two-sentence design is acceptable.
+**Triage first:** Brainstorming is for designs. Bugfixes, config tweaks, and one-file changes skip this skill — the using-superpowers triage rule routes them straight to execution, where a short inline statement of intended approach (and real alternatives) still precedes the edit. If the user brings a trivial task here anyway, a two-sentence design is acceptable.
 
 ## Anti-Pattern: "This Is Too Simple To Need A Design"
 

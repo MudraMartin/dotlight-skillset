@@ -4,6 +4,39 @@ All notable changes to DotLightSkillset will be documented in this file.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.2] — 2026-07-12
+
+### Fixed — SessionStart hook never fired on Windows (exec-form `cat`)
+
+The 0.6.1 "deterministic composition wiring" was not actually deployed on Windows. Debug-log evidence (`claude --debug`): *"Hook command failed to spawn (SessionStart:startup): Executable not found in $PATH: \"cat\""*. Root cause: the hook used **exec form** (`"command": "cat"` + `args` array), which per the hooks docs spawns the executable directly via PATH lookup with no shell — and `cat.exe` lives only in Git's `usr\bin`, which is not on the native Windows PATH (only `Git\cmd` is). The 0.6.1 changelog called exec form "Windows-safe"; it was exactly backwards. **Shell form** (a single command string, no `args`) runs via `sh -c` on macOS/Linux and **Git Bash on Windows** (PowerShell fallback, where `cat` is an alias) — so the hook now reads:
+
+```json
+{ "type": "command", "command": "cat \"${CLAUDE_PLUGIN_ROOT}/hooks/session-context.md\"" }
+```
+
+Net effect: `session-context.md` had never been injected into any Windows session; the triage/discipline/gate rules reached sessions only probabilistically via the `using-superpowers` skill.
+
+### Fixed — triage wording suppressed idea-proposing on ordinary planning turns (the 0.8.x planning regression)
+
+Maintainer-reported symptom: since 0.6.x, sessions "stopped proposing ideas and approaches — they just tersely state what's happening." A 14-agent audit (6 candidate mechanisms, adversarial two-lens verification each, installed-copy check, coverage critic) traced it to the **triage rule added in 0.6.0** (`using-superpowers` "## Triage" section, echoed into `hooks/session-context.md` in 0.6.1 and `brainstorming`'s "Triage first" line). Three wordings did the damage:
+
+1. *"No brainstorming, no plan documents"* — written as bare English, not "don't invoke the brainstorming **skill**", so models read it as "don't volunteer ideas" on every Direct-track turn.
+2. *"Full workflow … **only** for new features touching 3+ files…"* — the entire middle band of ordinary work (a bug thought out loud, a small change, ambiguous scope) was excluded from the one skill that mandates "Propose 2-3 approaches with trade-offs and your recommendation".
+3. *"When in doubt, ask the user which track"* — converted what used to be a proactive proposal turn into a bare procedural routing question.
+
+Adversarially cleared as non-causes: the brainstorming rebuild (propose-2-3-approaches and its description are byte-identical to 0.5.3), `lazy-senior-dev` (self-scoped to post-design implementation; refuted by both verifiers), the trigger-first description rewrites (no planning-skill description changed), and `caveman` (auto-invocation disabled in 0.6.0 — opposite direction).
+
+Rewritten in all three places so minimalism governs artifacts, never ideation:
+
+- Direct track now reads *"Skip the brainstorming skill and plan documents — not the thinking: still open with your intended approach, and name real alternatives when they exist."*
+- New triage clause: *"Approach-shaped turns — the user asks how to tackle something, weighs options, or thinks out loud — get 2-3 proposed approaches with a recommendation, on either track; task size never cancels ideation."*
+- *"When in doubt about the track, lead with your recommended approach and the track it implies, and let the user steer — don't just ask which track."*
+- Dropped the *"only"* from the Full-workflow trigger; `brainstorming`'s "skip this skill entirely" echo softened the same way.
+
+### Changed
+
+- Both manifests bumped to `0.8.2` (synchronous as always).
+
 ## [0.8.1] — 2026-07-11
 
 ### Fixed — duplicate hook registration broke plugin load

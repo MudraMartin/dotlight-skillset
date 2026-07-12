@@ -19,10 +19,10 @@ This is not negotiable. You cannot rationalize your way out of this.
 
 Pick the track before reaching for workflow skills:
 
-- **Direct track** — bugfix, config or DI tweak, one-file change, rename/reformat: direct edit + tests + short self-review. No brainstorming, no plan documents.
-- **Full workflow** — brainstorming → plan → TDD → review: only for new features touching 3+ files, a new aggregate, or cross-layer refactors.
+- **Direct track** — bugfix, config or DI tweak, one-file change, rename/reformat: direct edit + tests + short self-review. Skip the brainstorming skill and plan documents — not the thinking: still open with your intended approach, and name real alternatives when they exist.
+- **Full workflow** — brainstorming → plan → TDD → review: new features touching 3+ files, a new aggregate, or cross-layer refactors.
 
-When in doubt, ask the user which track. Triage picks the track; the skill rule below still applies within it (systematic-debugging for bugs, TDD for new code).
+Approach-shaped turns — the user asks how to tackle something, weighs options, or thinks out loud — get 2-3 proposed approaches with a recommendation, on either track; task size never cancels ideation. When in doubt about the track, lead with your recommended approach and the track it implies, and let the user steer — don't just ask which track. Triage picks the track; the skill rule below still applies within it (systematic-debugging for bugs, TDD for new code).
 
 ## The Rule
 
