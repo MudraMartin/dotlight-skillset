@@ -19,8 +19,8 @@ This is not negotiable. You cannot rationalize your way out of this.
 
 Pick the track before reaching for workflow skills:
 
-- **Direct track** — bugfix, config or DI tweak, one-file change, rename/reformat: direct edit + tests + short self-review. Skip the brainstorming skill and plan documents — not the thinking: still open with your intended approach, and name real alternatives when they exist.
-- **Full workflow** — brainstorming → plan → TDD → review: new features touching 3+ files, a new aggregate, or cross-layer refactors.
+- **Direct track** — bugfix, code port, config or DI tweak, one-file change, rename/reformat: skip the brainstorming skill and plan documents — not the thinking: still open with your intended approach, and name real alternatives when they exist. If the change touches executable code (bugfixes and code ports included), it runs test-first via dotlight-skillset:test-driven-development: failing test → minimal change → green + short self-review; bugs enter through dotlight-skillset:systematic-debugging first (root cause before fix). If it touches no executable code (config/DI value, rename with no serialized/mapped/public-API impact, reformat, presentation-only markup/CSS): direct edit + short self-review. Anything adding or changing a persisted shape is never Direct-track.
+- **Full workflow** — brainstorming → writing-plans → executing-plans → review: new features touching 3+ files, a new aggregate, or cross-layer refactors. Execution runs every task red-green via dotlight-skillset:test-driven-development against the plan's designed Domain and Persistence Model.
 
 Approach-shaped turns — the user asks how to tackle something, weighs options, or thinks out loud — get 2-3 proposed approaches with a recommendation, on either track; task size never cancels ideation. When in doubt about the track, lead with your recommended approach and the track it implies, and let the user steer — don't just ask which track. Triage picks the track; the skill rule below still applies within it (systematic-debugging for bugs, TDD for new code).
 
@@ -36,8 +36,8 @@ Then announce "Using [skill] to [purpose]" and follow the skill exactly. If it h
 
 When multiple skills apply, process skills come first — they set the approach, then implementation skills (frontend-design, etc.) carry it out. Brainstorming and systematic-debugging are Superpowers' most common process skills, but the rule holds for any of them.
 
-- "Let's build X" → superpowers:brainstorming first, then implementation skills.
-- "Fix this bug" → superpowers:systematic-debugging first, then domain skills.
+- "Let's build X" → dotlight-skillset:brainstorming first, then implementation skills.
+- "Fix this bug" → dotlight-skillset:systematic-debugging first, then domain skills.
 
 ## Red Flags
 

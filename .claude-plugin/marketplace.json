@@ -9,8 +9,8 @@
     {
       "name": "dotlight-skillset",
       "source": "./",
-      "version": "0.8.2",
-      "description": "A lightweight curated Claude Code skillset for .NET developers — 0.8.2 fixes the SessionStart hook that never fired on Windows (exec-form cat → shell form) and repairs the 0.6.0 triage wording that suppressed inline idea-proposing on ordinary planning turns (ideation now survives on both tracks). On 0.8.0: all 18 remaining passive .NET pattern descriptions rewritten trigger-first. On 0.7.0: nhibernate-patterns (NH as first-class runtime). On 0.6.x: SessionStart hook, wired review chain, upstream sync, lazy-senior-dev, database-design-conventions + database-review.",
+      "version": "0.9.0",
+      "description": "A lightweight curated Claude Code skillset for .NET developers — 0.9.0 rewires test-driven-development into the deterministic dispatch surface: Direct track gates on 'touches executable code' (test-first, bugs via systematic-debugging), executing-plans carries TDD as REQUIRED sub-skill per task, cross-references renamed to the real dotlight-skillset: namespace, and an orchestration rule keeps the track invariant under Workflow/ultracode/subagent execution. On 0.8.2: SessionStart hook fixed on Windows (exec-form cat → shell form) + triage ideation repair. On 0.8.0: 18 passive .NET descriptions rewritten trigger-first. On 0.7.0: nhibernate-patterns. On 0.6.x: SessionStart hook, wired review chain, upstream sync, lazy-senior-dev, database-design-conventions + database-review.",
       "author": {
         "name": "Martin Mudra",
         "email": "martin.mudra@scalesoft.cz"

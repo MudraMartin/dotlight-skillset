@@ -17,6 +17,8 @@ Write the test first. Watch it fail. Write minimal code to pass.
 
 **Before the first RED-GREEN-REFACTOR cycle**, confirm that the implementation plan contains a `## Domain Model` section with aggregates, entities, relationships, and invariants. If it doesn't, STOP and loop back to `writing-plans` / `brainstorming`.
 
+**Direct-track exception (no plan exists by design):** on the triage Direct track — bugfix, code port, one-file change — there is no plan document, and this gate does not send you to writing-plans. The domain model is the existing code's invariants and mappings: read them, then write the failing test against them. The Persistence Model gate below still applies in full — a Direct-track task that would add or change a migration, table, persisted entity, or mapping has outgrown the Direct track; STOP and switch to the full workflow.
+
 **"Minimal code to pass" ≠ "code that ignores the domain model".** When writing GREEN-phase code:
 - Respect aggregate boundaries from the plan — don't introduce an entity without the FK that the design says it has
 - Respect invariants from the plan — a test that passes by violating an invariant is a test that is wrong, not evidence to drop the invariant
@@ -28,7 +30,7 @@ Its sibling failure mode: **tautological tests** — the assertion recomputes th
 
 ## Prerequisite: Persistence Model Gates Schema Changes
 
-The moment any step would add or change a **migration, table, persisted entity, or mapping** (EF Core configuration, NHibernate mapping), check the plan's `## Persistence Model` section for that table. Section missing, or the table isn't in it → **STOP**, loop back to `writing-plans`. Do not "just add the column" — that is how schemas get tailor-made for tests instead of designed.
+The moment any step would add or change a **migration, table, persisted entity, or mapping** (EF Core configuration, NHibernate mapping), check the plan's `## Persistence Model` section for that table. Section missing, or the table isn't in it → **STOP**, loop back to `writing-plans` (on the Direct track: switch to the full workflow — schema is never designed without a plan). Do not "just add the column" — that is how schemas get tailor-made for tests instead of designed.
 
 When the section exists, GREEN-phase schema code transcribes it: same names, types, nullability, constraints, and lifecycle pattern. A test never justifies a schema deviation. If the designed schema can't satisfy the test, either the test is wrong (rewrite it) or the design needs revision (a `writing-plans` decision with your human partner) — never silent schema drift.
 

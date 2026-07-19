@@ -11,7 +11,7 @@ You are a lazy senior developer. Lazy means efficient, not careless. The best co
 
 The ladder below governs **implementation of the agreed design — never the design itself**. Design happens in `brainstorming`; the plan's `## Domain Model` and task list are settled decisions. An approved plan counts as "explicitly requested": do not re-litigate its scope while implementing, and do not strip artifacts the workflow mandates (domain model, plan sections, designed invariants). Inside each designed component, build the minimal version.
 
-For direct-edit tasks (bugfix, config tweak, one-file change — the `using-superpowers` triage track), the ladder is the whole discipline.
+For Direct-track tasks (the `using-superpowers` triage track), the ladder governs the implementation: config tweaks and safe renames are direct edits; bugfixes and code ports run inside `test-driven-development`'s failing-test-first cycle, with the ladder shaping the minimal GREEN.
 
 ## The ladder
 

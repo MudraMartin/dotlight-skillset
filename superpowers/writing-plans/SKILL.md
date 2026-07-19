@@ -99,7 +99,7 @@ independently testable deliverable.
 ```markdown
 # [Feature Name] Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. (subagent-driven-development is deliberately excluded in this project — see CLAUDE.md.) Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use dotlight-skillset:executing-plans to implement this plan task-by-task. (subagent-driven-development is deliberately excluded in this project — see CLAUDE.md.) Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** [One sentence describing what this builds]
 
@@ -226,5 +226,5 @@ After saving the plan, hand off to execution:
 
 **"Plan complete and saved to `docs/superpowers/plans/<filename>.md`. Ready to execute?"**
 
-- **REQUIRED SUB-SKILL:** Use superpowers:executing-plans
+- **REQUIRED SUB-SKILL:** Use dotlight-skillset:executing-plans
 - Batch execution with checkpoints — each batch ends at its review gate, and the plan closes with the Final review

@@ -4,6 +4,33 @@ All notable changes to DotLightSkillset will be documented in this file.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.0] — 2026-07-19
+
+### Fixed — TDD rewired into the deterministic dispatch surface (the "TDD vanished" regression)
+
+Maintainer-reported symptom: since ~0.5, downstream sessions (notably the three-system portal migration) almost never invoke `test-driven-development`, and the README workflow diagrams no longer describe observed behavior. A 34-agent investigation (5 evidence auditors → adversarial two-lens verification → completeness critic) plus a 30-cell RED baseline traced it to **multiple stacked causes, none of them TDD's own description** (byte-identical since 0.1.0):
+
+1. **`executing-plans` never carried TDD** (defect since 0.1.0): README diagram 2 promises `executing-plans → TDD`, but the skill body and its "Required workflow skills" list never named it — the loop existed only in the diagram.
+2. **0.6.0 triage rewrite dropped the TDD clauses**: the old `using-superpowers` "Rigid (TDD, debugging): Follow exactly" line was removed, and the new Direct track prescribed "direct edit **+ tests**" — a tests-after recipe for bugfixes, TDD's home turf.
+3. **0.6.1 session-context compressed the chain to "brainstorming → writing-plans → executing-plans → review"** — the deterministic carrier itself omitted the TDD node, countermanding TDD's "any feature or bugfix" trigger wherever the hook fired.
+4. **On Windows nothing deterministic fired at all until 0.8.2** (exec-form `cat`, see 0.8.2 entry), so 0.5.x–0.8.1 sessions ran purely on probabilistic frontmatter dispatch — where TDD's quiet description was out-competed by newer imperative ones (`rider-mcp-first` et al., 3 more workflow skills at 0.5.0, `lazy-senior-dev` at 0.6.0).
+
+Measured (quiz-format probes, opus, manual read): with 0.8.2 wording, test-before-implementation ordering appeared in **6/15** runs (code-port scenario **0/5**); with the 0.9.0 wording below, **6/6** with low variance.
+
+Changes (fair-reviewed, 1 critical + 4 important findings fixed pre-merge):
+
+- **`hooks/session-context.md` + `using-superpowers` triage**: Direct track now gates on an observable predicate — *touches executable code* (bugfixes and code ports included) → test-first via `test-driven-development` (failing test → minimal change → green), with bugs entering through `systematic-debugging` (root cause before fix); *no executable code* (config/DI value, safe rename, reformat, presentation-only markup/CSS) → direct edit. Persisted-shape changes are never Direct-track. Full workflow names TDD explicitly: every task runs red-green; the domain/persistence model is designed in the plan, never discovered by tests.
+- **`executing-plans`**: `test-driven-development` is now a REQUIRED SUB-SKILL per implementation task (a task without a failing-test step is a plan defect — stop, don't improvise tests-after); subagent dispatch points at "The Brief Must Embed the Discipline"; Integration list gains the TDD entry. The diagram-2 loop finally has a carrier.
+- **`test-driven-development`**: Direct-track exception for the Domain-Model gate — with no plan by design, the domain model is the existing code's invariants (fixes the fair-review critical: the gate would otherwise STOP-loop every Direct-track bugfix into `writing-plans`, silently escalating all small fixes to the full workflow). The Persistence-Model gate stands unweakened: on the Direct track a schema-touching step escalates to the full workflow.
+- **`lazy-senior-dev`**: Direct-track passage aligned — bugfixes/ports run inside TDD's cycle, the ladder shapes the minimal GREEN.
+- **Cross-references repaired**: 19 `superpowers:` prefixes → `dotlight-skillset:` (the plugin's actual namespace; the old prefixes resolved to nothing).
+- **Orchestration rule (new, hook + README)**: Workflow-tool/ultracode/parallel-subagent execution changes *who* executes, not the track — design stays in the main loop; every implementation brief embeds the discipline (subagents inherit no skills).
+- **README**: diagram 1 gains the executable-code gate node; triage prose and the recommended project `CLAUDE.md` snippet updated (incl. new `## Orchestration` section). Diagrams 2 and 3 now describe wiring that actually exists.
+
+### Changed
+
+- Both manifests bumped to `0.9.0`.
+
 ## [0.8.2] — 2026-07-12
 
 ### Fixed — SessionStart hook never fired on Windows (exec-form `cat`)

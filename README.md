@@ -168,16 +168,20 @@ Invoke via the `Agent` tool with `subagent_type: <agent-name>`.
 ```mermaid
 flowchart TD
     Start([Task arrives]) --> Triage{"What's the scope?"}
-    Triage -->|"Bugfix<br/>Config / DI tweak<br/>One-file change<br/>Rename / reformat"| Direct[/"Direct edit<br/>+ tests<br/>+ short self-review"/]
+    Triage -->|"Bugfix / code port<br/>Config / DI tweak<br/>One-file change<br/>Rename / reformat"| Behavior{"Touches<br/>executable code?"}
+    Behavior -->|"Yes (bugfix, code port)<br/>bugs: systematic-debugging first"| DirectTDD[/"test-driven-development<br/>failing test → minimal change<br/>→ green + short self-review"/]
+    Behavior -->|"No (config value, safe rename,<br/>reformat, markup/CSS only)"| DirectEdit[/"Direct edit<br/>+ short self-review"/]
     Triage -->|"New feature<br/>New aggregate<br/>Touches 3+ files<br/>Cross-layer refactor"| Full[/"Full workflow<br/>see diagram 2"/]
-    Direct --> DoneSmall([Merged])
+    DirectTDD --> DoneSmall([Merged])
+    DirectEdit --> DoneSmall
     Full --> DoneBig([Merged via PR])
 
-    style Direct fill:#d4edda,stroke:#28a745
+    style DirectTDD fill:#d4edda,stroke:#28a745
+    style DirectEdit fill:#d4edda,stroke:#28a745
     style Full fill:#fff3cd,stroke:#ffc107
 ```
 
-Superpowers defaults to "brainstorm everything" — the override skips that for small changes.
+Superpowers defaults to "brainstorm everything" — the override skips that for small changes. What it never skips is test-first: any change that touches executable code (bugfixes and code ports included) starts with a failing test, on both tracks — and bugs enter through `systematic-debugging` (root cause before fix). Anything adding or changing a persisted shape leaves the Direct track for the full workflow.
 
 ### 2. Full feature flow
 
@@ -255,7 +259,18 @@ Add a `CLAUDE.md` in your project root:
 
 Full workflow (brainstorming → plan → TDD → review) only for new features touching
 3+ files or introducing a new aggregate, and for cross-layer refactors. For
-bugfixes, config tweaks, one-file changes: edit directly, run tests, short review.
+bugfixes, code ports, and other small changes to executable code: failing test
+first, minimal change, short review (test-driven-development, no plan documents;
+bugs start in systematic-debugging). For config tweaks, safe renames, and
+markup/CSS-only changes: edit directly, short review. Schema changes always take
+the full workflow.
+
+## Orchestration
+
+Multi-agent orchestration (Workflow tool, ultracode, parallel subagents) changes
+who executes, not the track: design stays in the main loop, and every dispatched
+implementation brief embeds the discipline — failing-test-first steps, the
+governing Persistence Model excerpt, minimalism, and the gates the driver runs.
 
 ## Scope discipline
 
