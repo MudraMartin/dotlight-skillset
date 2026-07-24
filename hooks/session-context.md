@@ -10,5 +10,7 @@ Orchestration (Workflow tool, ultracode, parallel subagents) changes who execute
 
 Review gates: requesting-code-review at each plan checkpoint. .NET quality gates: dotnet-slopwatch + crap-analysis, plus database-review whenever the diff touches migrations, entities, or ORM mappings. Critical findings block merge.
 
+Unattended runs: when the user wants plan execution to keep going without supervision ("run overnight", "don't stop", AFK), invoke running-unattended BEFORE starting — it arms the Stop-hook gate and the heartbeat.
+
 AskUserQuestion is a deferred tool — preload once per session via ToolSearch "select:AskUserQuestion" before posing choice questions.
 </dotlight-skillset-session-rules>
